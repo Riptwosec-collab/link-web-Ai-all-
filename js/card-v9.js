@@ -65,7 +65,7 @@ function bodyHTML(link,col){
   const mark=smallIcon(link),tags=filteredTags(link);
   return `<div class="v9-card-body"><div class="v9-info-row"><div class="v9-site-mark">${mark?`<img src="${esc(mark)}" alt="" loading="lazy" decoding="async">`:''}<span>${esc(initials(link))}</span></div><div class="v9-info-copy"><div class="v9-domain-line"><span class="health-dot ${link.health?.state==='ok'?'health-ok':link.health?.state==='broken'?'health-broken':link.health?.state==='redirect'?'health-redirect':'health-unknown'}"></span><span>${esc(host(link))}</span></div><p class="v9-description">${esc(description(link))}</p></div></div><div class="v9-tags">${tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}${col?`<span class="tag text-cyan-300/70"><i class="ph ph-folder"></i> ${esc(col.name)}</span>`:''}</div></div>`;
 }
-function validateMedia(card,link){
+function validateMedia(card){
   const preview=card.querySelector('.preview');if(!preview)return;
   const photo=preview.querySelector('.v9-feature-photo');
   if(photo){
@@ -96,10 +96,13 @@ async function patchCards(){
     const stamp=`9:${link.updatedAt||0}:${link.favorite?1:0}:${link.pending?1:0}`;
     if(card.dataset.v9Stamp===stamp)continue;
     card.dataset.v9Stamp=stamp;card.classList.add('card-v9');
-    const preview=card.querySelector('.preview');if(preview)preview.innerHTML=previewHTML(link);
-    const body=card.querySelector(':scope > .p-3\\.5,:scope > .v9-card-body');
-    if(body){if(body.classList.contains('v9-card-body'))body.outerHTML=bodyHTML(link,cmap.get(link.collectionId));else body.outerHTML=bodyHTML(link,cmap.get(link.collectionId))}
-    validateMedia(card,link);
+    const preview=card.querySelector('.preview');
+    if(preview){
+      preview.innerHTML=previewHTML(link);
+      const body=preview.nextElementSibling;
+      if(body)body.outerHTML=bodyHTML(link,cmap.get(link.collectionId));
+    }
+    validateMedia(card);
   }
 }
 function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>setTimeout(patchCards,45))}
