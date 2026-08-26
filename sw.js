@@ -1,4 +1,4 @@
-const CACHE='slh-v4.0.0-feature-logo-v10';
+const CACHE='slh-v4.0.1-feature-background-fix';
 const CORE=[
   './','./index.html','./css/app.css','./css/performance-v5.css','./css/card-v9.css',
   './js/app.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v9.js','./js/cloud.js',
