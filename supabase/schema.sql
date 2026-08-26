@@ -1,0 +1,12 @@
+create extension if not exists pgcrypto;
+create table if not exists public.links (id text primary key, user_id uuid not null default auth.uid(), data jsonb not null default '{}'::jsonb, updated_at timestamptz not null default now());
+create table if not exists public.collections (id text primary key, user_id uuid not null default auth.uid(), data jsonb not null default '{}'::jsonb, updated_at timestamptz not null default now());
+create table if not exists public.workspaces (id text primary key, owner_id uuid not null default auth.uid(), data jsonb not null default '{}'::jsonb, updated_at timestamptz not null default now());
+create table if not exists public.workspace_members (workspace_id text references public.workspaces(id) on delete cascade, user_id uuid not null, role text not null check(role in ('owner','editor','viewer')), primary key(workspace_id,user_id));
+alter table public.links enable row level security; alter table public.collections enable row level security; alter table public.workspaces enable row level security; alter table public.workspace_members enable row level security;
+create policy "own links" on public.links for all using(user_id=auth.uid()) with check(user_id=auth.uid());
+create policy "own collections" on public.collections for all using(user_id=auth.uid()) with check(user_id=auth.uid());
+create policy "workspace owners" on public.workspaces for all using(owner_id=auth.uid()) with check(owner_id=auth.uid());
+create policy "read workspace membership" on public.workspace_members for select using(user_id=auth.uid() or exists(select 1 from public.workspaces w where w.id=workspace_id and w.owner_id=auth.uid()));
+create policy "owner manages membership" on public.workspace_members for all using(exists(select 1 from public.workspaces w where w.id=workspace_id and w.owner_id=auth.uid())) with check(exists(select 1 from public.workspaces w where w.id=workspace_id and w.owner_id=auth.uid()));
+create index if not exists links_user_id_idx on public.links(user_id); create index if not exists collections_user_id_idx on public.collections(user_id); create index if not exists workspaces_owner_id_idx on public.workspaces(owner_id);
