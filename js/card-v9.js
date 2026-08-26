@@ -2,7 +2,8 @@ import {getAll} from './db.js';
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const genericText=v=>/^(?:no description|untitled|home)$/i.test(String(v||'').trim())||/website or online service|general website|online service from/i.test(String(v||''));
-const genericIcon=u=>/google\.com\/s2\/favicons|favicon(?:\.ico)?|apple-touch-icon|manifest|\/icons?\//i.test(String(u||''));
+const googleIcon=u=>/google\.com\/s2\/favicons/i.test(String(u||''));
+const genericIcon=u=>googleIcon(u)||/favicon(?:\.ico)?|apple-touch-icon|manifest|\/icons?\//i.test(String(u||''));
 const badFeature=u=>!u||/favicon|apple-touch|manifest|logo|icon|sprite|pixel|badge/i.test(String(u).toLowerCase());
 const tlds=new Set(['com','net','org','co','th','io','ai','app','dev','xyz','site','online','me','info','biz','cc','tv','shop','store']);
 let queued=false;
@@ -27,7 +28,13 @@ function feature(link){
   const list=[link.featureImageUrl,declared==='feature'?link.brandAssetUrl:'',link.imageUrl].filter(Boolean);
   return list.find(x=>!badFeature(x))||'';
 }
-function smallIcon(link){return realLogo(link)||link.touchIconUrl||link.manifestIconUrl||link.favicon||''}
+function smallIcon(link){
+  const logo=realLogo(link);if(logo)return logo;
+  if(link.touchIconUrl)return link.touchIconUrl;
+  if(link.manifestIconUrl)return link.manifestIconUrl;
+  if(link.favicon&&!googleIcon(link.favicon))return link.favicon;
+  return '';
+}
 function filteredTags(link){
   const h=host(link).toLowerCase();
   const hostParts=new Set(h.split(/[.\-_/]+/).filter(Boolean));
@@ -97,11 +104,7 @@ async function patchCards(){
     if(card.dataset.v9Stamp===stamp)continue;
     card.dataset.v9Stamp=stamp;card.classList.add('card-v9');
     const preview=card.querySelector('.preview');
-    if(preview){
-      preview.innerHTML=previewHTML(link);
-      const body=preview.nextElementSibling;
-      if(body)body.outerHTML=bodyHTML(link,cmap.get(link.collectionId));
-    }
+    if(preview){preview.innerHTML=previewHTML(link);const body=preview.nextElementSibling;if(body)body.outerHTML=bodyHTML(link,cmap.get(link.collectionId))}
     validateMedia(card);
   }
 }
