@@ -1,52 +1,68 @@
-/* Smart Link Hub V10 canonical card rendering */
+/* Smart Link Hub V11 — background-first card rendering */
 .card-v9{overflow:hidden!important;contain:layout paint style;content-visibility:auto;contain-intrinsic-size:320px 300px}
-.card-v9 .preview{position:relative!important;height:176px!important;overflow:hidden!important;background:#090d15!important;isolation:isolate}
+.card-v9 .preview{position:relative!important;height:176px!important;overflow:hidden!important;background:#080c13!important;isolation:isolate}
 .card-v9.compact .preview{height:116px!important}
-.v9-brand-fallback{position:absolute;inset:0;z-index:0;display:grid;place-items:center;background:linear-gradient(145deg,#111722,#090d15 58%,#05070c)}
-.v9-brand-fallback.has-theme{background:linear-gradient(145deg,color-mix(in srgb,var(--v9-theme) 42%,#111722),color-mix(in srgb,var(--v9-theme) 14%,#05070c))}
-.v9-logo-img{max-width:132px!important;max-height:72px!important;width:auto!important;height:auto!important;object-fit:contain!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important}
-.v9-icon-img{width:50px!important;height:50px!important;object-fit:contain!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important;border-radius:12px}
-.v9-initials{min-width:58px;height:58px;padding:0 12px;border-radius:17px;display:grid;place-items:center;font-size:17px;font-weight:750;letter-spacing:.07em;color:#dbe5f2;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09)}
-.v9-cover-title{position:absolute;z-index:6;left:13px;right:116px;bottom:13px;min-width:0}.v9-cover-title p{font-size:8px;color:rgba(165,243,252,.68);text-transform:uppercase;letter-spacing:.13em}.v9-cover-title h3{margin-top:4px;font-size:14px;line-height:1.25;font-weight:650;color:#fff;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.v9-menu{position:absolute!important;right:10px!important;top:10px!important;z-index:7!important}.v9-menu .card-action{backdrop-filter:none!important;background:rgba(4,8,15,.72)!important}
-.v9-loading-pill{position:absolute;left:11px;top:11px;z-index:7;display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;border:1px solid rgba(103,232,249,.16);background:rgba(8,47,73,.66);color:#cffafe;font-size:7px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}.v9-loading-pill i{animation:v9Spin 1s linear infinite}
-.v9-card-body{padding:13px 14px 14px}.v9-info-row{display:flex;gap:10px;align-items:flex-start}.v9-site-mark{position:relative;width:36px;height:36px;flex:0 0 36px;border-radius:11px;display:grid;place-items:center;overflow:hidden;background:#0d131d;border:1px solid rgba(255,255,255,.065)}.v9-site-mark img{position:relative!important;inset:auto!important;width:24px!important;height:24px!important;object-fit:contain!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important}.v9-site-mark.v10-site-feature img{width:100%!important;height:100%!important;object-fit:cover!important}.v9-site-mark span{position:absolute;inset:0;display:grid;place-items:center;font-size:8px;font-weight:800;color:#94a3b8;letter-spacing:.04em;z-index:-1}.v9-site-mark img.hidden+span{z-index:1}
-.v9-info-copy{min-width:0;flex:1}.v9-domain-line{display:flex;align-items:center;gap:7px;min-width:0;color:#64748b;font-size:9px}.v9-domain-line>span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v9-description{margin-top:5px;min-height:30px;color:#94a3b8;font-size:9px;line-height:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.v9-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px}.v9-tags:empty{display:none}
+
+.v9-cover-title{position:absolute;z-index:7;left:13px;right:116px;bottom:13px;min-width:0}
+.v9-cover-title p{font-size:8px;color:rgba(165,243,252,.72);text-transform:uppercase;letter-spacing:.13em}
+.v9-cover-title h3{margin-top:4px;font-size:14px;line-height:1.25;font-weight:650;color:#fff;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.v9-menu{position:absolute!important;right:10px!important;top:10px!important;z-index:8!important}
+.v9-menu .card-action{backdrop-filter:none!important;background:rgba(4,8,15,.72)!important}
+.v9-loading-pill{position:absolute;left:11px;top:11px;z-index:8;display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;border:1px solid rgba(103,232,249,.16);background:rgba(8,47,73,.66);color:#cffafe;font-size:7px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.v9-loading-pill i{animation:v9Spin 1s linear infinite}
+
+/* Photo mode: Hero / OG / Feature / Screenshot owns the complete background. */
+.v11-photo-surface{position:absolute;inset:0;z-index:2;overflow:hidden;background:#080c13}
+.v11-bg-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;opacity:1!important;filter:saturate(1.02) brightness(.72)!important;transform:none!important;animation:none!important}
+.v11-photo-dim{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(2,5,11,.91) 0%,rgba(2,5,11,.28) 43%,rgba(2,5,11,.13) 70%,rgba(2,5,11,.24) 100%);pointer-events:none}
+/* Only a TRUE logo may sit over a background image. Feature art itself is never repeated as a square tile. */
+.v11-logo-on-photo{position:absolute;left:50%;top:41%;transform:translate(-50%,-50%);z-index:3;width:126px;height:76px;padding:13px 16px;border-radius:20px;display:grid;place-items:center;background:rgba(5,9,16,.74);border:1px solid rgba(255,255,255,.15);box-shadow:0 12px 28px rgba(0,0,0,.28)}
+.v11-logo-on-photo .v11-real-logo{max-width:100%!important;max-height:100%!important;width:auto!important;height:auto!important;object-fit:contain!important;filter:none!important;opacity:1!important;transform:none!important}
+
+/* Generated brand background for sites where no usable media can be extracted. */
+.v11-generated-surface{position:absolute;inset:0;z-index:1;overflow:hidden;background:linear-gradient(145deg,color-mix(in srgb,var(--v11-accent,#334155) 54%,#111827),color-mix(in srgb,var(--v11-accent,#334155) 18%,#05080e) 62%,#05070c)}
+.v11-grid{position:absolute;inset:0;opacity:.18;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(to bottom,black,transparent 82%)}
+.v11-orb{position:absolute;border-radius:999px;pointer-events:none;opacity:.26;filter:none!important}
+.v11-orb-a{width:170px;height:170px;left:-42px;top:-78px;background:color-mix(in srgb,var(--v11-accent,#334155) 72%,#38bdf8)}
+.v11-orb-b{width:150px;height:150px;right:-54px;bottom:-76px;background:color-mix(in srgb,var(--v11-accent,#334155) 62%,#8b5cf6)}
+.v11-watermark{position:absolute;right:13px;top:14px;font-size:62px;line-height:1;font-weight:850;letter-spacing:-.08em;color:rgba(255,255,255,.045);user-select:none}
+.v11-logo-card,.v11-icon-card,.v11-initial-card{position:absolute;left:50%;top:41%;transform:translate(-50%,-50%);z-index:3;display:grid;place-items:center;background:rgba(6,10,18,.76);border:1px solid rgba(255,255,255,.13);box-shadow:0 12px 28px rgba(0,0,0,.24)}
+.v11-logo-card{width:126px;height:78px;padding:13px 16px;border-radius:21px}
+.v11-logo-card .v11-real-logo{max-width:100%!important;max-height:100%!important;width:auto!important;height:auto!important;object-fit:contain!important;filter:none!important;opacity:1!important}
+.v11-icon-card{width:72px;height:72px;padding:13px;border-radius:21px}
+.v11-icon-card>img{width:100%!important;height:100%!important;object-fit:contain!important;border-radius:12px;filter:none!important;opacity:1!important}
+.v11-initial-card{width:72px;height:72px;border-radius:21px;font-size:19px;font-weight:820;letter-spacing:.07em;color:#e2e8f0}
+.v11-logo-initials,.v11-icon-initials{font-size:16px;font-weight:800;color:#dbe5f2}
+
+/* The generated layer is emergency-only when a website image exists. */
+.v11-photo-surface~.v11-photo-fallback{display:none!important}
+.preview.v11-photo-failed>.v11-photo-surface{display:none!important}
+.preview.v11-photo-failed>.v11-photo-fallback{display:block!important;z-index:2!important}
+
+.v11-cover-shade{position:absolute;inset:0;z-index:6;pointer-events:none;background:linear-gradient(to top,rgba(3,6,12,.72),transparent 55%)}
+
+/* Body mark: never repeat a Hero/Feature image as the little square when it is already the background. */
+.v9-card-body{padding:13px 14px 14px}
+.v9-info-row{display:flex;gap:10px;align-items:flex-start}
+.v9-site-mark{position:relative;width:36px;height:36px;flex:0 0 36px;border-radius:11px;display:grid;place-items:center;overflow:hidden;background:#0d131d;border:1px solid rgba(255,255,255,.065)}
+.v9-site-mark img{position:relative!important;inset:auto!important;width:24px!important;height:24px!important;object-fit:contain!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important}
+.v9-site-mark span{position:absolute;inset:0;display:grid;place-items:center;font-size:8px;font-weight:800;color:#94a3b8;letter-spacing:.04em;z-index:1}
+.v9-site-mark img:not(.hidden){z-index:2;background:#0d131d}
+.v9-info-copy{min-width:0;flex:1}
+.v9-domain-line{display:flex;align-items:center;gap:7px;min-width:0;color:#64748b;font-size:9px}
+.v9-domain-line>span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v9-description{margin-top:5px;min-height:30px;color:#94a3b8;font-size:9px;line-height:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.v9-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px}.v9-tags:empty{display:none}
+
 .card-v9:hover{transform:translateY(-2px)!important}
 .v9-save-toast{position:relative;display:flex!important;align-items:center!important;gap:8px!important;overflow:hidden}.v9-save-toast>i{color:#a5f3fc}.v9-save-toast>b{position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#2563eb,#22d3ee);transform-origin:left;animation:v9Toast 2.2s linear forwards}.v9-saved-input{animation:v9Input .34s ease}.v9-spin{animation:v9Spin .8s linear infinite}
 
-/* V10 — Feature Logo: when a real logo is absent, use the site's strongest visual as the mark AND background. */
-.v10-logo-surface,.v10-neutral-fallback,.v10-feature-surface{position:absolute;inset:0;overflow:hidden}
-.v10-logo-surface,.v10-neutral-fallback{z-index:0;background:linear-gradient(145deg,#111722,#090d15 58%,#05070c)}
-.v10-logo-surface.has-theme,.v10-neutral-fallback.has-theme{background:linear-gradient(145deg,color-mix(in srgb,var(--v10-theme) 42%,#111722),color-mix(in srgb,var(--v10-theme) 13%,#05070c))}
-.v10-logo-card,.v10-icon-card,.v10-initial-card{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:3;display:grid;place-items:center;background:rgba(6,10,18,.80);border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 28px rgba(0,0,0,.25)}
-.v10-logo-card{width:126px;height:80px;padding:14px 17px;border-radius:22px}.v10-real-logo{max-width:100%!important;max-height:100%!important;width:auto!important;height:auto!important;object-fit:contain!important;filter:none!important;opacity:1!important;transform:none!important}
-.v10-icon-card{width:72px;height:72px;padding:13px;border-radius:21px}.v10-icon-card>img{width:100%!important;height:100%!important;object-fit:contain!important;border-radius:12px}.v10-fallback-initials{font-size:16px;font-weight:800;color:#dbe5f2}.v10-initial-card{width:70px;height:70px;border-radius:20px;font-size:18px;font-weight:800;letter-spacing:.07em;color:#dbe5f2}
+/* Kill all legacy cover layers, including V10's duplicated feature tile. */
+.card-v11 .brand-logo-cover,.card-v11 .smart-color-cover,.card-v11 .preview-loader,.card-v11 .saving-pill,.card-v11 .ready-pill,.card-v11 .ready-burst,.card-v11 .v9-brand-fallback,.card-v11 .v9-feature-photo,.card-v11 .v10-logo-surface,.card-v11 .v10-neutral-fallback,.card-v11 .v10-feature-surface,.card-v11 .v10-feature-logo{display:none!important}
 
-/* Feature surface owns the whole visual layer. Emergency fallback is hidden unless validation fails. */
-.v10-feature-surface{z-index:2;display:block;background:#070b12}
-.v10-feature-surface:not(.v10-feature-fallback)~.v10-neutral-fallback{display:none!important}
-.v10-feature-bg{position:absolute!important;inset:-2%!important;z-index:0!important;width:104%!important;height:104%!important;object-fit:cover!important;object-position:center!important;opacity:.72!important;filter:saturate(1.04) brightness(.46)!important;transform:scale(1.02)!important;animation:none!important}
-.v10-feature-dim{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(2,5,11,.86),rgba(2,5,11,.14) 54%,rgba(2,5,11,.24)),radial-gradient(circle at 50% 35%,rgba(255,255,255,.07),transparent 38%)}
-.v10-feature-logo{position:absolute;left:50%;top:41%;transform:translate(-50%,-50%);z-index:3;width:92px;height:92px;border-radius:25px;overflow:hidden;background:#0a0f18;border:1px solid rgba(255,255,255,.20);box-shadow:0 15px 34px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.08)}
-.v10-feature-logo-img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center 42%!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important}.v10-feature-logo>span{position:absolute;right:6px;bottom:6px;z-index:4;width:22px;height:22px;border-radius:8px;display:grid;place-items:center;background:rgba(3,7,14,.78);border:1px solid rgba(255,255,255,.12);color:#cffafe;font-size:9px}
-
-/* Real-logo branch: feature/neutral surfaces exist only as emergency fallback. */
-.v10-feature-fallback{display:none!important}
-.v10-logo-surface~.v10-feature-fallback,.v10-logo-surface~.v10-neutral-fallback{display:none!important}
-.preview.v10-logo-failed>.v10-logo-surface{display:none!important}
-.preview.v10-logo-failed>.v10-feature-fallback{display:block!important;z-index:2!important}
-.preview.v10-logo-failed>.v10-feature-fallback~.v10-neutral-fallback{display:none!important}
-
-/* Feature branch: only show Neutral when the selected hero/feature art is genuinely unusable. */
-.preview.v10-feature-failed>.v10-feature-surface:not(.v10-feature-fallback){display:none!important}
-.preview.v10-feature-failed>.v10-feature-surface:not(.v10-feature-fallback)~.v10-neutral-fallback{display:block!important;z-index:2!important}
-.preview.v10-logo-failed.v10-feature-failed>.v10-feature-fallback{display:none!important}
-.preview.v10-logo-failed.v10-feature-failed>.v10-neutral-fallback{display:block!important;z-index:2!important}
-.v10-cover-shade{position:absolute;inset:0;z-index:5;pointer-events:none;background:linear-gradient(to top,rgba(3,6,12,.88),rgba(3,6,12,.01) 48%,rgba(3,6,12,.08))}
-
-.card-v10 .brand-logo-cover,.card-v10 .smart-color-cover,.card-v10 .preview-loader,.card-v10 .saving-pill,.card-v10 .ready-pill,.card-v10 .ready-burst,.card-v10 .v9-brand-fallback,.card-v10 .v9-feature-photo{display:none!important}
-@keyframes v9Spin{to{transform:rotate(360deg)}}@keyframes v9Toast{to{transform:scaleX(0)}}@keyframes v9Input{50%{border-color:rgba(52,211,153,.52);box-shadow:0 0 0 3px rgba(52,211,153,.05)}}
-@media(max-width:767px){.card-v9 .preview{height:154px!important}.v9-cover-title{right:110px}.v9-card-body{padding:12px 13px}.v10-feature-logo{width:80px;height:80px;border-radius:22px}.v10-logo-card{width:112px;height:72px;border-radius:19px}}
+@keyframes v9Spin{to{transform:rotate(360deg)}}
+@keyframes v9Toast{to{transform:scaleX(0)}}
+@keyframes v9Input{50%{border-color:rgba(52,211,153,.52);box-shadow:0 0 0 3px rgba(52,211,153,.05)}}
+@media(max-width:767px){.card-v9 .preview{height:154px!important}.v9-cover-title{right:110px}.v9-card-body{padding:12px 13px}.v11-logo-on-photo,.v11-logo-card{width:110px;height:70px;border-radius:18px}.v11-icon-card,.v11-initial-card{width:66px;height:66px;border-radius:19px}}
 @media(prefers-reduced-motion:reduce){.v9-loading-pill i,.v9-save-toast>b,.v9-saved-input{animation:none!important}}
-@supports not (color:color-mix(in srgb,#000,#fff)){.v10-logo-surface.has-theme,.v10-neutral-fallback.has-theme{background:linear-gradient(145deg,var(--v10-theme,#111722),#05070c)}}
+@supports not (color:color-mix(in srgb,#000,#fff)){.v11-generated-surface{background:linear-gradient(145deg,var(--v11-accent,#334155),#05070c)}}
