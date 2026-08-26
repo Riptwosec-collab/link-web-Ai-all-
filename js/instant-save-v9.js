@@ -1,5 +1,5 @@
 import {getAll,getOne,putOne,uid,logEvent,getSetting} from './db.js';
-import {getMetadata,displayHost,makeSnapshot} from './metadata.js';
+import {getMetadata,displayHost,makeSnapshot} from './metadata-v9.js';
 
 const inflight=new Set();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -53,7 +53,7 @@ async function hydrate(id,cfg){
       imageUrl:m?.imageUrl||current.imageUrl||'',featureImageUrl:m?.featureImageUrl||current.featureImageUrl||'',
       favicon:m?.favicon||current.favicon||'',logoUrl:m?.logoUrl||current.logoUrl||'',touchIconUrl:m?.touchIconUrl||current.touchIconUrl||'',manifestIconUrl:m?.manifestIconUrl||current.manifestIconUrl||'',
       themeColor:m?.themeColor||current.themeColor||'',brandKind:m?.brandKind||current.brandKind||'',brandAssetUrl:m?.brandAssetUrl||current.brandAssetUrl||'',
-      category:m?.category||current.category||'General',tags:m?.tags?.length?m.tags:(current.tags||[]),metadataSource:m?.source||current.metadataSource||'local',
+      category:m?.category||current.category||'General',tags:m?.tags||[],metadataSource:m?.source||current.metadataSource||'local',
       pending:false,previewReadyAt:now,metadataRefreshedAt:now,cardDataVersion:9,updatedAt:now
     };
     await putOne('links',next);
