@@ -1,5 +1,5 @@
-const CACHE='slh-v3.1.0-auth';
-const CORE=['./','./index.html','./css/app.css','./js/app.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/cloud.js','./manifest.webmanifest','./icons/icon.svg'];
+const CACHE='slh-v3.2.0-metadata';
+const CORE=['./','./index.html','./css/app.css','./js/app.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-repair.js','./js/cloud.js','./manifest.webmanifest','./icons/icon.svg'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
