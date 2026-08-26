@@ -1,0 +1,39 @@
+/* V3.5 Performance + logo-color fallback */
+#dynamic-content{overscroll-behavior:contain;scroll-behavior:auto}
+.ambient{animation:none!important;filter:blur(86px)!important;opacity:.10!important}
+.page-hero:after,.link-card .preview:before,.smart-color-cover,.cover-glow,.cover-grid,.cover-symbol{display:none!important}
+.holo-card,.glass-panel{backdrop-filter:blur(10px)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 12px 34px rgba(0,0,0,.14)!important}
+.holo-card:hover{transform:translateY(-1px)!important;box-shadow:0 12px 34px rgba(14,165,233,.05),inset 0 1px 0 rgba(255,255,255,.035)!important}
+.link-card{contain:layout paint style;content-visibility:auto;contain-intrinsic-size:320px 300px;transform:none!important;will-change:auto!important;box-shadow:0 10px 28px rgba(0,0,0,.20)!important;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease!important}
+.link-card:hover{transform:translateY(-2px)!important;box-shadow:0 14px 34px rgba(0,0,0,.27)!important}
+.card-action,.preview-loader,.saving-pill,.ready-pill{backdrop-filter:none!important}
+.link-card .preview{background:#0b1020!important;isolation:isolate}
+
+.brand-logo-cover{position:absolute;inset:0;z-index:0;overflow:hidden;background:linear-gradient(145deg,#111827,#070b14);opacity:1;transition:opacity .22s ease}
+.brand-logo-bg{position:absolute;inset:-22%;width:144%!important;height:144%!important;object-fit:cover!important;opacity:.74!important;filter:blur(18px) saturate(1.5) brightness(.7);transform:scale(1.12);animation:none!important}
+.brand-logo-shade{position:absolute;inset:0;background:linear-gradient(145deg,rgba(4,8,18,.16),rgba(3,6,14,.38) 58%,rgba(3,6,14,.72)),radial-gradient(circle at 50% 42%,rgba(255,255,255,.13),transparent 31%)}
+.brand-logo-box{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:82px;height:82px;border-radius:24px;display:grid;place-items:center;background:rgba(6,10,20,.60);border:1px solid rgba(255,255,255,.13);box-shadow:0 12px 28px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.07)}
+.brand-logo-main{position:relative!important;inset:auto!important;width:54px!important;height:54px!important;object-fit:contain!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important;border-radius:13px}
+.brand-logo-box>span{position:absolute;right:-7px;bottom:-7px;min-width:29px;height:29px;padding:0 6px;border-radius:9px;display:grid;place-items:center;background:rgba(2,6,15,.82);border:1px solid rgba(255,255,255,.10);font-size:8px;font-weight:700;letter-spacing:.06em;color:#dbeafe}
+.brand-logo-text b{font-size:22px;color:#e2e8f0;letter-spacing:.06em}.logo-fallback-text .brand-logo-box>img,.logo-fallback-text .brand-logo-bg{display:none!important}
+
+.preview-image,.link-card .preview>img{z-index:1!important;animation:none!important;opacity:1!important;transition:opacity .2s ease,transform .22s ease!important}
+.preview.use-logo-cover>.preview-image,.preview.use-logo-cover>img.low-quality-preview{display:none!important}
+.preview.use-photo-cover>.brand-logo-cover{opacity:0}.preview.use-photo-cover>.preview-image,.preview.use-photo-cover>img{display:block!important}
+.link-card:hover .preview.use-photo-cover>.preview-image,.link-card:hover .preview.use-photo-cover>img{transform:scale(1.018)!important;filter:none!important}
+
+.preview-loader.fast-loader{z-index:6!important;background:rgba(4,8,18,.42)!important;gap:6px!important}
+.preview-loader.fast-loader:before,.preview-loader.fast-loader:after{display:none!important}
+.preview-loader.fast-loader .preview-orbit{width:44px!important;height:44px!important;border-radius:14px!important;animation:fastPulse 1.15s ease-in-out infinite!important;box-shadow:none!important}
+.preview-loader.fast-loader .preview-orbit:before{display:none!important}.preview-loader.fast-loader b{font-size:10px!important}.preview-loader.fast-loader small{font-size:8px!important}
+.saving-pill{animation:savedLite 1.25s ease-in-out infinite!important;box-shadow:none!important}.saving-pill i{animation:none!important}.ready-pill{animation:readyLite .3s ease both,readyGone .3s ease 3.3s forwards!important;box-shadow:none!important}.ready-burst{display:none!important}
+.instant-toast{box-shadow:0 12px 34px rgba(0,0,0,.28)!important}.instant-toast-line:after{animation:toastProgress 2.55s linear forwards!important}
+.magic-input.save-pop{animation:inputSavedLite .34s ease!important}
+
+@keyframes fastPulse{0%,100%{transform:scale(.96);opacity:.78}50%{transform:scale(1.04);opacity:1}}
+@keyframes savedLite{0%,100%{opacity:.82}50%{opacity:1}}
+@keyframes readyLite{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}@keyframes readyGone{to{opacity:0}}
+@keyframes inputSavedLite{0%{border-color:rgba(34,211,238,.2)}50%{border-color:rgba(52,211,153,.48)}100%{border-color:rgba(34,211,238,.2)}}
+
+@media(max-width:767px){.holo-card,.glass-panel{backdrop-filter:blur(6px)!important}.brand-logo-bg{filter:blur(14px) saturate(1.35) brightness(.68)}.brand-logo-box{width:70px;height:70px;border-radius:20px}.brand-logo-main{width:46px!important;height:46px!important}.link-card{contain-intrinsic-size:300px 276px}}
+@media(prefers-reduced-motion:reduce){.preview-loader.fast-loader .preview-orbit,.saving-pill,.ready-pill,.instant-toast-line:after,.magic-input.save-pop{animation:none!important}}
