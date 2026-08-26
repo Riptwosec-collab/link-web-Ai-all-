@@ -1,7 +1,7 @@
-const CACHE='slh-v4.1.0-background-first-v11';
+const CACHE='slh-v4.2.0-bottom-left-brand-v12';
 const CORE=[
-  './','./index.html','./css/app.css','./css/performance-v5.css','./css/card-v9.css',
-  './js/app.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v9.js','./js/cloud.js',
+  './','./index.html','./css/app.css','./css/performance-v5.css','./css/card-v12.css',
+  './js/app.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v12.js','./js/cloud.js',
   './manifest.webmanifest','./icons/icon.svg'
 ];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
