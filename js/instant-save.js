@@ -65,15 +65,21 @@ async function hydrate(id,cfg){
       description:m?.description||current.description||'',
       summary:m?.summary||m?.description||current.summary||'',
       imageUrl:m?.imageUrl||current.imageUrl||'',
+      featureImageUrl:m?.featureImageUrl||current.featureImageUrl||'',
       favicon:m?.favicon||current.favicon||'',
-      logoUrl:m?.logoUrl||m?.favicon||current.logoUrl||current.favicon||'',
+      logoUrl:m?.logoUrl||current.logoUrl||'',
+      touchIconUrl:m?.touchIconUrl||current.touchIconUrl||'',
+      manifestIconUrl:m?.manifestIconUrl||current.manifestIconUrl||'',
+      themeColor:m?.themeColor||current.themeColor||'',
+      brandKind:m?.brandKind||current.brandKind||'',
+      brandAssetUrl:m?.brandAssetUrl||current.brandAssetUrl||'',
       category:m?.category||current.category||'General',
       tags:m?.tags?.length?m.tags:(current.tags||[]),
       metadataSource:m?.source||current.metadataSource||'local',
       metadataRefreshedAt:now,previewReadyAt:now,pending:false,updatedAt:now
     };
     await putOne('links',next);
-    await logEvent('metadata_refresh',{id,source:next.metadataSource,instant:true,hasImage:!!next.imageUrl});
+    await logEvent('metadata_refresh',{id,source:next.metadataSource,instant:true,hasImage:!!next.imageUrl,brandKind:next.brandKind||'unknown'});
     await saveSnapshot(next,cfg);
     rerender();
   }catch(err){
@@ -95,7 +101,7 @@ async function instantSave(raw){
   const now=Date.now();
   const fallbackLogo=`https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(parsed.asciiHost)}`;
   const draft={id:uid('lnk'),url:parsed.url,normalizedUrl:parsed.normalizedUrl,title:parsed.displayHost,domain:parsed.displayHost,
-    description:'',summary:'กำลังดึงชื่อ คำอธิบาย และรูป Preview…',imageUrl:'',favicon:fallbackLogo,logoUrl:fallbackLogo,
+    description:'',summary:'กำลังดึงชื่อ คำอธิบาย และภาพเด่นของเว็บไซต์…',imageUrl:'',featureImageUrl:'',favicon:fallbackLogo,logoUrl:'',touchIconUrl:'',manifestIconUrl:'',themeColor:'',brandKind:'icon',brandAssetUrl:fallbackLogo,
     category:'Loading',tags:[],collectionId:'col_inbox',favorite:false,createdAt:now,updatedAt:now,pending:true,metadataSource:'pending',
     health:{state:'unknown',status:null,checkedAt:null}};
 
@@ -104,7 +110,7 @@ async function instantSave(raw){
     await logEvent('save',{id:draft.id,category:'Loading',instant:true});
     const input=document.getElementById('url-input');
     if(input){input.value='';input.disabled=false;input.placeholder='Paste URL or type one here…';input.classList.add('save-pop');setTimeout(()=>input.classList.remove('save-pop'),420)}
-    toast('Saved · กำลังเติมข้อมูล');
+    toast('Saved · กำลังสร้าง Brand Cover');
     rerender();
     const cfg=await settings();
     hydrate(draft.id,cfg);
@@ -131,30 +137,44 @@ document.addEventListener('click',intercept,true);
 document.addEventListener('keydown',intercept,true);
 document.addEventListener('paste',intercept,true);
 
-function logoFor(link){
-  if(link.logoUrl)return link.logoUrl;
+function fallbackIcon(link){
+  if(link.touchIconUrl)return link.touchIconUrl;
+  if(link.manifestIconUrl)return link.manifestIconUrl;
   if(link.favicon)return link.favicon;
   try{return `https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(new URL(link.url).hostname)}`}catch{return ''}
 }
+function initials(link){const value=String(link.title||link.domain||'WEB').trim();const p=value.split(/[\s._-]+/).filter(Boolean);return (p.length>1?p[0][0]+p[1][0]:value.slice(0,2)).toUpperCase()}
+function safeColor(v=''){const s=String(v).trim();return /^(#[0-9a-f]{3,8}|rgb\(|rgba\(|hsl\(|hsla\()/i.test(s)?s:''}
 
-function initials(link){
-  const value=String(link.title||link.domain||'WEB').trim();
-  const p=value.split(/[\s._-]+/).filter(Boolean);
-  return (p.length>1?p[0][0]+p[1][0]:value.slice(0,2)).toUpperCase();
+function brandChoice(link){
+  const declared=String(link.brandKind||'').toLowerCase();
+  const logo=declared==='logo'?(link.brandAssetUrl||link.logoUrl||link.touchIconUrl||link.manifestIconUrl||''):'';
+  const feature=link.featureImageUrl||(declared==='feature'?link.brandAssetUrl:'')||link.imageUrl||'';
+  const icon=fallbackIcon(link);
+  if(logo)return {kind:'logo',asset:logo,bg:logo};
+  if(feature)return {kind:'feature',asset:feature,bg:feature};
+  if(icon)return {kind:'icon',asset:icon,bg:icon};
+  return {kind:'text',asset:'',bg:''};
 }
 
 function ensureBrandCover(preview,link){
   let cover=preview.querySelector('.brand-logo-cover');
-  const logo=logoFor(link);
-  if(!cover){
-    cover=document.createElement('div');
-    cover.className='brand-logo-cover';
-    preview.insertBefore(cover,preview.firstChild);
+  const choice=brandChoice(link),theme=safeColor(link.themeColor)||'#0b1020';
+  if(!cover){cover=document.createElement('div');cover.className='brand-logo-cover';preview.insertBefore(cover,preview.firstChild)}
+  const stamp=`${choice.kind}|${choice.asset}|${theme}|${link.title||''}`;
+  if(cover.dataset.brandStamp===stamp)return cover;
+  cover.dataset.brandStamp=stamp;
+  cover.dataset.brandKind=choice.kind;
+  cover.style.setProperty('--site-theme',theme);
+  if(choice.kind==='feature'){
+    cover.innerHTML=`<img class="brand-feature-bg" src="${esc(choice.bg)}" alt=""><div class="brand-logo-shade"></div><div class="brand-feature-box"><img class="brand-feature-main" src="${esc(choice.asset)}" alt=""><span>FEATURE</span></div>`;
+  }else if(choice.kind==='logo'||choice.kind==='icon'){
+    cover.innerHTML=`<img class="brand-logo-bg" src="${esc(choice.bg)}" alt=""><div class="brand-logo-shade"></div><div class="brand-logo-box"><img class="brand-logo-main" src="${esc(choice.asset)}" alt=""><span>${esc(initials(link))}</span></div>`;
+  }else{
+    cover.innerHTML=`<div class="brand-logo-shade"></div><div class="brand-logo-box brand-logo-text"><b>${esc(initials(link))}</b></div>`;
   }
-  if(cover.dataset.logo===logo&&cover.dataset.title===String(link.title||''))return cover;
-  cover.dataset.logo=logo;cover.dataset.title=String(link.title||'');
-  cover.innerHTML=logo?`<img class="brand-logo-bg" src="${esc(logo)}" alt=""><div class="brand-logo-shade"></div><div class="brand-logo-box"><img class="brand-logo-main" src="${esc(logo)}" alt=""><span>${esc(initials(link))}</span></div>`:`<div class="brand-logo-shade"></div><div class="brand-logo-box brand-logo-text"><b>${esc(initials(link))}</b></div>`;
-  cover.querySelectorAll('img').forEach(img=>img.addEventListener('error',()=>{preview.classList.add('logo-fallback-text')},{once:true}));
+  cover.querySelectorAll('img').forEach(img=>img.addEventListener('error',()=>{preview.classList.add('brand-asset-error');cover.dataset.brandKind='text'},{once:true}));
+  preview.dataset.brandKind=choice.kind;
   return cover;
 }
 
@@ -166,13 +186,13 @@ function bindImageQuality(img,preview){
     const area=w*h,oddRatio=h?Math.max(w/h,h/w)>4.5:true;
     const looksLikeIcon=/favicon|logo|icon|sprite|pixel|badge/i.test(src);
     const poor=!w||!h||w<520||h<220||area<260000||oddRatio||looksLikeIcon;
-    preview.classList.toggle('use-logo-cover',poor);
+    preview.classList.toggle('use-brand-cover',poor);
     preview.classList.toggle('use-photo-cover',!poor);
     img.classList.toggle('low-quality-preview',poor);
     if(poor)img.setAttribute('aria-hidden','true');
   };
   img.addEventListener('load',decide,{once:true});
-  img.addEventListener('error',()=>{preview.classList.add('use-logo-cover');preview.classList.remove('use-photo-cover')},{once:true});
+  img.addEventListener('error',()=>{preview.classList.add('use-brand-cover');preview.classList.remove('use-photo-cover')},{once:true});
   if(img.complete)requestAnimationFrame(decide);
 }
 
@@ -192,10 +212,10 @@ async function decorateCards(){
     card.classList.toggle('is-pending',!!link.pending);
     const img=preview.querySelector(':scope > img');
     if(img){img.classList.add('preview-image');img.loading='lazy';img.decoding='async';bindImageQuality(img,preview)}
-    else{preview.classList.add('use-logo-cover');preview.classList.remove('use-photo-cover')}
-    if(link.pending&&!preview.querySelector('.preview-loader'))preview.insertAdjacentHTML('beforeend','<div class="preview-loader fast-loader"><span class="preview-orbit"><i class="ph ph-sparkle"></i></span><b>Saved</b><small>กำลังโหลดข้อมูลเว็บไซต์…</small></div><span class="saving-pill"><i class="ph-fill ph-lightning"></i> Saved</span>');
+    else{preview.classList.add('use-brand-cover');preview.classList.remove('use-photo-cover')}
+    if(link.pending&&!preview.querySelector('.preview-loader'))preview.insertAdjacentHTML('beforeend','<div class="preview-loader fast-loader"><span class="preview-orbit"><i class="ph ph-sparkle"></i></span><b>Saved</b><small>กำลังหาโลโก้ · สี · Hero · ภาพเด่น…</small></div><span class="saving-pill"><i class="ph-fill ph-lightning"></i> Saved</span>');
     const ready=Number(link.previewReadyAt||0)>0&&Date.now()-Number(link.previewReadyAt)<4200;
-    if(ready&&!link.pending&&!preview.querySelector('.ready-pill'))preview.insertAdjacentHTML('beforeend','<span class="ready-pill"><i class="ph-fill ph-check-circle"></i> Ready</span>');
+    if(ready&&!link.pending&&!preview.querySelector('.ready-pill'))preview.insertAdjacentHTML('beforeend',`<span class="ready-pill"><i class="ph-fill ph-check-circle"></i> ${preview.dataset.brandKind==='feature'?'Feature ready':'Ready'}</span>`);
   }
 }
 
@@ -206,18 +226,7 @@ function scheduleDecorate(){
     else setTimeout(decorateCards,24);
   });
 }
-
-function observeGrid(){
-  const root=document.getElementById('dynamic-content');
-  if(!root)return setTimeout(observeGrid,100);
-  new MutationObserver(scheduleDecorate).observe(root,{childList:true});
-  scheduleDecorate();
-}
+function observeGrid(){const root=document.getElementById('dynamic-content');if(!root)return setTimeout(observeGrid,100);new MutationObserver(scheduleDecorate).observe(root,{childList:true});scheduleDecorate()}
 observeGrid();
 
-(async()=>{
-  await sleep(900);
-  const cfg=await settings();
-  const pending=(await getAll('links')).filter(x=>x.pending).slice(0,2);
-  pending.forEach(x=>hydrate(x.id,cfg));
-})();
+(async()=>{await sleep(900);const cfg=await settings();const pending=(await getAll('links')).filter(x=>x.pending).slice(0,2);pending.forEach(x=>hydrate(x.id,cfg))})();
