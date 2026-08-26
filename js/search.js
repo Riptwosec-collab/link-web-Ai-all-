@@ -1,0 +1,5 @@
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+function grams(s){s=norm(s);const out=[];for(let i=0;i<Math.max(1,s.length-1);i++)out.push(s.slice(i,i+2));return out}
+function dice(a,b){if(!a&&!b)return 1;if(!a||!b)return 0;const A=grams(a),B=grams(b),counts=new Map();A.forEach(x=>counts.set(x,(counts.get(x)||0)+1));let hit=0;B.forEach(x=>{const n=counts.get(x)||0;if(n){hit++;counts.set(x,n-1)}});return 2*hit/(A.length+B.length||1)}
+export function scoreLink(link,q){q=norm(q);if(!q)return 1;const title=norm(link.title),url=norm(link.url),desc=norm(link.description),category=norm(link.category),tags=norm((link.tags||[]).join(' '));let score=0;if(title.includes(q))score+=8;if(url.includes(q))score+=6;if(tags.includes(q))score+=5;if(category.includes(q))score+=4;if(desc.includes(q))score+=2;score+=dice(title,q)*4+dice(tags,q)*2+dice(url,q);return score}
+export function fuzzySearch(links,q){return links.map(x=>({x,s:scoreLink(x,q)})).filter(r=>r.s>.42).sort((a,b)=>b.s-a.s).map(r=>r.x)}
