@@ -1,0 +1,99 @@
+ id="all-links-grid">
+                        
+                        <!-- Sample Card 1 (Original Mock) -->
+                        <div class="glass-card rounded-xl overflow-hidden flex flex-col group cursor-pointer">
+                            <div class="h-28 w-full bg-gradient-to-br from-[#0f5742] via-[#2ba57b] to-[#b3e3ce] relative p-4 flex flex-col justify-end">
+                                <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+                                <h2 class="text-black text-xl font-bold tracking-tight relative z-10 leading-tight">Introducing<br>GPT-4o</h2>
+                            </div>
+                            <div class="p-3 flex flex-col flex-1 relative bg-brand-panel/90">
+                                <div class="absolute -top-5 left-3 w-8 h-8 rounded bg-[#10a37f] border-2 border-brand-panel flex items-center justify-center text-white text-lg shadow-lg">
+                                    <i class="ph-fill ph-robot"></i>
+                                </div>
+                                <div class="flex justify-between items-start mt-3">
+                                    <div>
+                                        <h3 class="text-white font-medium text-sm flex items-center gap-1">OpenAI <span class="w-1.5 h-1.5 bg-green-500 rounded-full status-dot"></span></h3>
+                                        <p class="text-[10px] text-gray-500">openai.com</p>
+                                    </div>
+                                    <i class="ph-fill ph-star text-yellow-500 text-xs"></i>
+                                </div>
+                                <div class="flex flex-wrap gap-1 mt-auto pt-3">
+                                    <span class="px-2 py-0.5 rounded text-[9px] bg-white/5 text-gray-400 border border-white/5">AI</span>
+                                    <span class="px-2 py-0.5 rounded text-[9px] bg-white/5 text-gray-400 border border-white/5">research</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column (Stats) -->
+            <aside class="w-full lg:w-72 flex flex-col gap-4 flex-shrink-0 animate-stagger">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass p-4 rounded-xl flex flex-col gap-1 relative overflow-hidden">
+                        <div class="w-8 h-8 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center mb-1"><i class="ph ph-link text-lg"></i></div>
+                        <span class="text-[10px] text-gray-400">Total Links</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-white text-lg font-semibold">1,248</span>
+                            <span class="text-[10px] text-green-400">+24</span>
+                        </div>
+                    </div>
+                    
+                    <div class="glass p-4 rounded-xl flex flex-col gap-1 relative overflow-hidden">
+                        <div class="w-8 h-8 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center mb-1"><i class="ph ph-link-break text-lg"></i></div>
+                        <span class="text-[10px] text-gray-400">Broken Links</span>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-white text-lg font-semibold">12</span>
+                            <span class="text-[10px] text-green-400">-3</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        `;
+
+        // 2. Dedicated content for each menu — redesigned for purpose + visual identity
+        const searchContent = `
+            <div class="page-shell space-y-6 pb-10">
+                <section class="page-hero rounded-3xl p-7 md:p-9 min-h-[250px] flex items-end mini-grid">
+                    <div class="relative z-10 w-full">
+                        <div class="soft-chip text-cyan-300 border-cyan-400/20 bg-cyan-400/5 mb-5"><i class="ph-fill ph-sparkle"></i> Neural Search</div>
+                        <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-6">
+                            <div>
+                                <h2 class="text-3xl md:text-4xl font-semibold text-white tracking-tight">Find anything in your web brain.</h2>
+                                <p class="text-gray-400 mt-2 max-w-2xl">Search by title, domain, topic, tag or a natural-language idea. Results are grouped by relevance.</p>
+                            </div>
+                            <div class="flex gap-2 text-[10px] text-gray-500"><span class="soft-chip"><i class="ph ph-command"></i>K Focus</span><span class="soft-chip">1,248 indexed</span></div>
+                        </div>
+                        <div class="neon-field rounded-2xl h-16 mt-7 flex items-center px-5 gap-3 max-w-4xl">
+                            <i class="ph ph-magnifying-glass text-2xl text-cyan-300"></i>
+                            <input id="smart-search-input" class="bg-transparent outline-none flex-1 text-base text-white placeholder:text-gray-600" placeholder="Try: design inspiration, AI tools, GitHub projects...">
+                            <button class="glow-button rounded-xl px-4 py-2 text-xs text-white font-semibold">Search</button>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="grid xl:grid-cols-[1fr_330px] gap-6">
+                    <section class="space-y-4">
+                        <div class="flex items-center justify-between"><h3 class="text-white font-semibold">Top results</h3><div class="flex gap-2"><span class="soft-chip text-blue-300">Smart ranking</span><span class="soft-chip">Newest</span></div></div>
+                        <div id="search-result-list" class="space-y-3">
+                            ${[
+                                ['robot','ChatGPT','chatgpt.com','AI assistant for research, writing, coding and everyday problem solving.','AI · Productivity','cyan'],
+                                ['github-logo','GitHub','github.com','Host source code, collaborate on repositories and automate software workflows.','Dev · Source Code','violet'],
+                                ['figma-logo','Figma Community','figma.com','Browse UI kits, templates, design systems and collaborative design resources.','Design · UI/UX','pink'],
+                                ['youtube-logo','YouTube','youtube.com','Watch videos, tutorials, music and creator content across millions of channels.','Media · Learning','red']
+                            ].map(([icon,title,domain,desc,tags,tone]) => `
+                                <div class="holo-card rounded-2xl p-4 flex items-center gap-4 search-result" data-search="${title} ${domain} ${desc} ${tags}">
+                                    <div class="icon-orb text-${tone}-300 text-xl"><i class="ph-fill ph-${icon}"></i></div>
+                                    <div class="min-w-0 flex-1"><div class="flex items-center gap-2"><h4 class="text-white font-medium">${title}</h4><span class="text-[9px] text-gray-600">${domain}</span></div><p class="text-xs text-gray-400 mt-1 line-clamp-2">${desc}</p><p class="text-[10px] text-gray-600 mt-2">${tags}</p></div>
+                                    <button class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition"><i class="ph ph-arrow-up-right"></i></button>
+                                </div>`).join('')}
+                        </div>
+                    </section>
+                    <aside class="space-y-4">
+                        <div class="holo-card rounded-2xl p-5"><div class="flex items-center justify-between"><h3 class="text-white font-semibold">AI filters</h3><i class="ph-fill ph-brain text-violet-400"></i></div><div class="mt-4 flex flex-wrap gap-2"><span class="soft-chip text-cyan-300">All</span><span class="soft-chip">AI</span><span class="soft-chip">Dev</span><span class="soft-chip">Design</span><span class="soft-chip">Media</span><span class="soft-chip">Research</span></div></div>
+                        <div class="holo-card rounded-2xl p-5"><div class="flex items-center justify-between"><h3 class="text-white font-semibold">Recent searches</h3><i class="ph ph-clock-counter-clockwise text-gray-500"></i></div><div class="mt-4 space-y-3 text-xs text-gray-400"><div class="flex justify-between"><span>network tools</span><span class="text-gray-600">18 results</span></div><div class="flex justify-between"><span>photo editor ai</span><span class="text-gray-600">31 results</span></div><div class="flex justify-between"><span>travel ideas</span><span class="text-gray-600">14 results</span></div></div></div>
+                    </aside>
+                </div>
+            </div>`;
+
+        cons
