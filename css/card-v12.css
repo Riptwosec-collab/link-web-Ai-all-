@@ -1,0 +1,56 @@
+/* Smart Link Hub V12 — background first, brand mark bottom-left only */
+.card-v12{overflow:hidden!important;contain:layout paint style;content-visibility:auto;contain-intrinsic-size:320px 290px}
+.card-v12 .preview{position:relative!important;height:176px!important;overflow:hidden!important;background:#080c13!important;isolation:isolate}
+.card-v12.compact .preview{height:116px!important}
+
+/* Background: real site image when available. */
+.v12-photo-bg,.v12-generated-bg{position:absolute;inset:0;overflow:hidden}
+.v12-photo-bg{z-index:1;background:#080c13}
+.v12-bg-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;opacity:1!important;filter:saturate(1.02) brightness(.76)!important;transform:none!important;animation:none!important}
+.v12-photo-dim{position:absolute;inset:0;background:linear-gradient(to top,rgba(2,5,11,.88) 0%,rgba(2,5,11,.20) 44%,rgba(2,5,11,.10) 72%,rgba(2,5,11,.18) 100%);pointer-events:none}
+
+/* Generated brand background only when no usable site image exists. */
+.v12-generated-bg{z-index:0;background:linear-gradient(145deg,color-mix(in srgb,var(--v12-accent,#334155) 55%,#111827),color-mix(in srgb,var(--v12-accent,#334155) 18%,#05080e) 62%,#05070c)}
+.v12-bg-grid{position:absolute;inset:0;opacity:.16;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
+.v12-bg-orb{position:absolute;border-radius:999px;pointer-events:none;opacity:.24;filter:none!important}
+.v12-bg-orb-a{width:176px;height:176px;left:-48px;top:-82px;background:color-mix(in srgb,var(--v12-accent,#334155) 74%,#38bdf8)}
+.v12-bg-orb-b{width:158px;height:158px;right:-58px;bottom:-82px;background:color-mix(in srgb,var(--v12-accent,#334155) 64%,#8b5cf6)}
+.v12-bg-watermark{position:absolute;right:14px;top:16px;font-size:64px;line-height:1;font-weight:850;letter-spacing:-.08em;color:rgba(255,255,255,.04);user-select:none}
+
+/* If a website image exists, its generated fallback stays hidden until validation fails. */
+.v12-photo-bg~.v12-photo-fallback{display:none!important}
+.preview.v12-photo-failed>.v12-photo-bg{display:none!important}
+.preview.v12-photo-failed>.v12-photo-fallback{display:block!important;z-index:1!important}
+
+/* Single brand position: bottom-left. No centered logo/tile anywhere. */
+.v12-cover-shade{position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(to top,rgba(3,6,12,.70),transparent 58%)}
+.v12-brand-row{position:absolute;left:12px;right:112px;bottom:12px;z-index:5;display:flex;align-items:center;gap:10px;min-width:0}
+.v12-brand-badge{width:42px;height:42px;flex:0 0 42px;border-radius:13px;display:grid;place-items:center;overflow:hidden;background:rgba(6,10,18,.82);border:1px solid rgba(255,255,255,.14);box-shadow:0 8px 22px rgba(0,0,0,.26)}
+.v12-brand-badge.is-logo{padding:7px}
+.v12-brand-badge.is-icon{padding:5px}
+.v12-brand-img{position:relative!important;inset:auto!important;max-width:100%!important;max-height:100%!important;width:auto!important;height:auto!important;object-fit:contain!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important}
+.v12-brand-badge.is-icon .v12-brand-img{width:100%!important;height:100%!important;border-radius:8px}
+.v12-brand-initials{font-size:10px;font-weight:850;letter-spacing:.05em;color:#dbe5f2}
+.v12-title-copy{min-width:0;flex:1}
+.v12-title-copy p{font-size:8px;color:rgba(165,243,252,.74);text-transform:uppercase;letter-spacing:.13em}
+.v12-title-copy h3{margin-top:3px;font-size:14px;line-height:1.2;font-weight:650;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+
+.v12-menu{position:absolute!important;right:10px!important;top:10px!important;z-index:7!important}
+.v12-menu .card-action{backdrop-filter:none!important;background:rgba(4,8,15,.72)!important}
+.v12-loading-pill{position:absolute;left:11px;top:11px;z-index:7;display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;border:1px solid rgba(103,232,249,.16);background:rgba(8,47,73,.66);color:#cffafe;font-size:7px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+.v12-loading-pill i{animation:v12Spin 1s linear infinite}
+
+/* Body no longer repeats a logo/icon. */
+.v12-card-body{padding:12px 14px 14px}
+.v12-domain-line{display:flex;align-items:center;gap:7px;min-width:0;color:#64748b;font-size:9px}
+.v12-domain-line>span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v12-description{margin-top:5px;min-height:30px;color:#94a3b8;font-size:9px;line-height:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.v12-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}.v12-tags:empty{display:none}
+
+.card-v12:hover{transform:translateY(-2px)!important}
+.card-v12 .brand-logo-cover,.card-v12 .smart-color-cover,.card-v12 .preview-loader,.card-v12 .saving-pill,.card-v12 .ready-pill,.card-v12 .ready-burst,.card-v12 .v9-brand-fallback,.card-v12 .v9-feature-photo,.card-v12 .v10-logo-surface,.card-v12 .v10-neutral-fallback,.card-v12 .v10-feature-surface,.card-v12 .v10-feature-logo,.card-v12 .v11-photo-surface,.card-v12 .v11-generated-surface,.card-v12 .v11-logo-on-photo,.card-v12 .v11-logo-card,.card-v12 .v11-icon-card,.card-v12 .v11-initial-card{display:none!important}
+
+@keyframes v12Spin{to{transform:rotate(360deg)}}
+@media(max-width:767px){.card-v12 .preview{height:154px!important}.v12-brand-row{right:106px;bottom:10px}.v12-brand-badge{width:38px;height:38px;flex-basis:38px;border-radius:12px}.v12-title-copy h3{font-size:13px}.v12-card-body{padding:11px 13px 13px}}
+@media(prefers-reduced-motion:reduce){.v12-loading-pill i{animation:none!important}}
+@supports not (color:color-mix(in srgb,#000,#fff)){.v12-generated-bg{background:linear-gradient(145deg,var(--v12-accent,#334155),#05070c)}}
