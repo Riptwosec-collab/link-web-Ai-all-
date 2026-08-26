@@ -69,8 +69,10 @@ function backgroundHTML(link){
   return `<div class="v12-photo-bg"><img class="v12-bg-photo" src="${esc(art)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"><div class="v12-photo-dim"></div></div>${generatedBackground(link,{fallback:true})}`;
 }
 function brandBadge(link){
-  const logo=realLogo(link),icon=qualityIcon(link),asset=logo||icon;
-  if(asset)return `<div class="v12-brand-badge ${logo?'is-logo':'is-icon'}"><img class="v12-brand-img" src="${esc(asset)}" alt=""><span class="v12-brand-initials hidden">${esc(initials(link))}</span></div>`;
+  const logo=realLogo(link),art=feature(link),icon=qualityIcon(link);
+  if(logo)return `<div class="v12-brand-badge is-logo"><img class="v12-brand-img" src="${esc(logo)}" alt=""><span class="v12-brand-initials hidden">${esc(initials(link))}</span></div>`;
+  if(art)return `<div class="v12-brand-badge is-feature"><img class="v12-brand-img is-feature-img" src="${esc(art)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span class="v12-brand-initials hidden">${esc(initials(link))}</span></div>`;
+  if(icon)return `<div class="v12-brand-badge is-icon"><img class="v12-brand-img" src="${esc(icon)}" alt=""><span class="v12-brand-initials hidden">${esc(initials(link))}</span></div>`;
   return `<div class="v12-brand-badge is-text"><span class="v12-brand-initials">${esc(initials(link))}</span></div>`;
 }
 function previewHTML(link){
@@ -92,10 +94,22 @@ function validateMedia(card){
   }
   const mark=preview.querySelector('.v12-brand-img');
   if(mark){
-    const fail=()=>{mark.classList.add('hidden');mark.nextElementSibling?.classList.remove('hidden')};
+    const badge=mark.closest('.v12-brand-badge');
+    const isFeature=badge?.classList.contains('is-feature');
+    const fail=()=>{
+      mark.classList.add('hidden');
+      mark.nextElementSibling?.classList.remove('hidden');
+      badge?.classList.remove('is-logo','is-icon','is-feature');
+      badge?.classList.add('is-text');
+    };
+    const decide=()=>{
+      const w=mark.naturalWidth||0,h=mark.naturalHeight||0;
+      const good=isFeature?(w>=80&&h>=80&&w*h>=12000):(w>=24&&h>=24);
+      if(!good)fail();
+    };
     mark.addEventListener('error',fail,{once:true});
-    mark.addEventListener('load',()=>{if((mark.naturalWidth||0)<24||(mark.naturalHeight||0)<24)fail()},{once:true});
-    if(mark.complete&&mark.naturalWidth&&((mark.naturalWidth||0)<24||(mark.naturalHeight||0)<24))fail();
+    mark.addEventListener('load',decide,{once:true});
+    if(mark.complete&&mark.naturalWidth)requestAnimationFrame(decide);
   }
 }
 async function patchCards(){
@@ -105,7 +119,7 @@ async function patchCards(){
   const map=new Map(links.map(x=>[x.id,x])),cmap=new Map(cols.map(x=>[x.id,x]));
   for(const card of cards){
     const link=map.get(card.dataset.linkId);if(!link)continue;
-    const stamp=`12:${link.updatedAt||0}:${link.favorite?1:0}:${link.pending?1:0}`;
+    const stamp=`12.1:${link.updatedAt||0}:${link.favorite?1:0}:${link.pending?1:0}`;
     if(card.dataset.v12Stamp===stamp)continue;
     card.dataset.v12Stamp=stamp;card.classList.add('card-v12');
     const preview=card.querySelector('.preview');
