@@ -1,5 +1,5 @@
 import {getAll,putOne,getSetting,logEvent} from './db.js';
-import {getMetadata,displayHost} from './metadata.js';
+import {getMetadata,displayHost} from './metadata-v9.js';
 
 const DATA_VERSION=9;
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
