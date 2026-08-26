@@ -1,0 +1,54 @@
+ngs-tab w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-xs bg-blue-500/10 text-blue-300 border border-blue-400/10';
+            }));
+        }
+
+        // --- Original SPA Logic (Updated) ---
+
+        const navItems = document.querySelectorAll('.nav-item');
+        const dynamicContent = document.getElementById('dynamic-content');
+
+        function loadPage(pageId) {
+            // อัปเดตเนื้อหา
+            if (pages[pageId]) {
+                dynamicContent.innerHTML = pages[pageId];
+            } else {
+                dynamicContent.innerHTML = `<div class="page-shell"><div class="page-hero rounded-3xl p-10 text-center"><i class="ph ph-warning-circle text-4xl text-gray-600"></i><h2 class="text-white text-xl font-semibold mt-4">Page unavailable</h2><p class="text-gray-500 text-xs mt-2">This section is not registered in Smart Link Hub.</p></div></div>`;
+            }
+
+            // จัดการคลาส Active และ Icon 
+            navItems.forEach(item => {
+                const iconElement = item.querySelector('i');
+                const iconName = item.getAttribute('data-icon');
+
+                if (item.getAttribute('data-page') === pageId) {
+                    item.classList.add('active');
+                    item.classList.remove('text-gray-400');
+                    iconElement.className = `ph-fill ph-${iconName} text-xl`;
+                } else {
+                    item.classList.remove('active');
+                    item.classList.add('text-gray-400');
+                    iconElement.className = `ph ph-${iconName} text-xl`;
+                }
+            });
+
+            // Attach page-specific interactions after each SPA render
+            if (pageId === 'home') setupHomePasteHandler();
+            if (pageId === 'search') setupSearchPage();
+            if (pageId === 'favorites') setupFavoritesPage();
+            if (pageId === 'settings') setupSettingsPage();
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = item.getAttribute('data-page');
+                loadPage(pageId);
+            });
+        });
+
+        // โหลดหน้า Home เป็นค่าเริ่มต้น
+        loadPage('home');
+
+    </script>
+</body>
+</html>
