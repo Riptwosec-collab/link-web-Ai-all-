@@ -1,4 +1,4 @@
-const CACHE='slh-v4.2.0-bottom-left-brand-v12';
+const CACHE='slh-v4.2.1-feature-badge-v12';
 const CORE=[
   './','./index.html','./css/app.css','./css/performance-v5.css','./css/card-v12.css',
   './js/app.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v12.js','./js/cloud.js',
