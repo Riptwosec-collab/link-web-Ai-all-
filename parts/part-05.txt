@@ -1,0 +1,64 @@
+um}</div><p class="text-[10px] text-gray-500 mt-1">${label}</p></div>`).join('')}</div>
+                <div class="grid xl:grid-cols-[1.45fr_.85fr] gap-5">
+                    <div class="holo-card rounded-2xl p-6"><div class="flex justify-between items-center"><div><h3 class="text-white font-semibold">Activity trend</h3><p class="text-[10px] text-gray-600 mt-1">Links opened during the last 7 days</p></div><span class="soft-chip">Live</span></div><div class="h-64 mt-7 relative flex items-end gap-3 border-b border-white/5">${[38,55,43,72,61,88,76,94,68,82,71,97].map((h,i)=>`<div class="group flex-1 h-full flex items-end"><div class="w-full rounded-t-xl bg-gradient-to-t from-blue-600/25 via-blue-500/50 to-cyan-300/80 group-hover:brightness-125 transition-all" style="height:${h}%"><div class="opacity-0 group-hover:opacity-100 transition text-[9px] text-white -translate-y-5 text-center">${h}</div></div></div>`).join('')}</div><div class="flex justify-between mt-3 text-[9px] text-gray-700"><span>Aug 15</span><span>Aug 20</span><span>Aug 26</span></div></div>
+                    <div class="space-y-5"><div class="holo-card rounded-2xl p-5"><h3 class="text-white font-semibold">Top categories</h3><div class="space-y-4 mt-5">${[['AI',38,'cyan'],['Development',27,'blue'],['Design',19,'violet'],['Travel',16,'emerald']].map(([l,v,t])=>`<div><div class="flex justify-between text-[10px]"><span class="text-gray-400">${l}</span><span class="text-gray-600">${v}%</span></div><div class="h-1.5 mt-2 rounded-full bg-white/5 overflow-hidden"><div class="h-full bg-${t}-400/70 rounded-full" style="width:${v}%"></div></div></div>`).join('')}</div></div><div class="holo-card rounded-2xl p-5"><div class="flex items-center gap-3"><div class="icon-orb text-amber-300"><i class="ph-fill ph-warning"></i></div><div><p class="text-white text-sm font-medium">12 broken links</p><p class="text-[10px] text-gray-600">Review and clean up stale saves.</p></div></div></div></div>
+                </div>
+            </div>`;
+
+        const importExportContent = `
+            <div class="page-shell space-y-6 pb-10">
+                <section class="page-hero rounded-3xl p-7 md:p-9"><div class="relative z-10"><div class="soft-chip text-blue-300 border-blue-400/20 bg-blue-400/5 mb-4"><i class="ph-fill ph-arrows-down-up"></i> Data Port</div><h2 class="text-3xl font-semibold text-white">Move your library in or out.</h2><p class="text-gray-400 mt-2 max-w-xl">Import bookmarks from browsers or export your Smart Link Hub data whenever you want.</p></div></section>
+                <div class="grid lg:grid-cols-2 gap-5">
+                    <div class="holo-card rounded-3xl p-6"><div class="flex items-center justify-between"><div class="icon-orb text-cyan-300"><i class="ph-fill ph-upload-simple text-xl"></i></div><span class="soft-chip">IMPORT</span></div><h3 class="text-white text-xl font-semibold mt-6">Bring bookmarks in</h3><p class="text-xs text-gray-500 mt-2">Drop a browser bookmark HTML, JSON or CSV file. Smart Link Hub can categorize records after import.</p><div class="mt-6 border border-dashed border-white/10 hover:border-cyan-400/30 rounded-2xl h-44 grid place-items-center bg-white/[.015] transition-colors"><div class="text-center"><i class="ph ph-file-arrow-up text-4xl text-gray-700"></i><p class="text-xs text-gray-400 mt-3">Drop file here</p><p class="text-[10px] text-gray-700 mt-1">HTML · JSON · CSV</p><button class="mt-4 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-[10px] text-gray-300">Choose file</button></div></div></div>
+                    <div class="holo-card rounded-3xl p-6"><div class="flex items-center justify-between"><div class="icon-orb text-violet-300"><i class="ph-fill ph-download-simple text-xl"></i></div><span class="soft-chip">EXPORT</span></div><h3 class="text-white text-xl font-semibold mt-6">Take your data with you</h3><p class="text-xs text-gray-500 mt-2">Create a portable backup of links, tags, collections and metadata.</p><div class="mt-6 grid grid-cols-2 gap-3">${[['JSON','Full backup','brackets-curly'],['CSV','Spreadsheet','table'],['HTML','Browser file','browser'],['ZIP','Complete archive','file-zip']].map(([fmt,desc,icon])=>`<button class="interactive-tile rounded-2xl border border-white/[.07] bg-white/[.025] p-4 text-left hover:bg-white/[.05] transition"><i class="ph ph-${icon} text-lg text-blue-300"></i><p class="text-white text-sm mt-3">${fmt}</p><p class="text-[9px] text-gray-600 mt-1">${desc}</p></button>`).join('')}</div><button class="glow-button w-full mt-4 rounded-xl py-3 text-xs text-white font-semibold">Export library</button></div>
+                </div>
+            </div>`;
+
+        const settingsContent = `
+            <div class="page-shell space-y-6 pb-10">
+                <section class="page-hero rounded-3xl p-7 md:p-9"><div class="relative z-10"><div class="soft-chip text-slate-300 mb-4"><i class="ph-fill ph-sliders-horizontal"></i> Control Center</div><h2 class="text-3xl font-semibold text-white">Tune Smart Link Hub your way.</h2><p class="text-gray-400 mt-2">Appearance, automation, metadata fetching, privacy and storage preferences.</p></div></section>
+                <div class="grid xl:grid-cols-[260px_1fr] gap-5"><aside class="holo-card rounded-2xl p-3 h-fit">${[['palette','Appearance'],['magic-wand','Automation'],['globe','Metadata'],['shield-check','Privacy'],['database','Storage']].map(([i,l],idx)=>`<button class="settings-tab w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-xs ${idx===0?'bg-blue-500/10 text-blue-300 border border-blue-400/10':'text-gray-500 hover:text-white hover:bg-white/[.03]'}"><i class="ph ph-${i} text-lg"></i>${l}</button>`).join('')}</aside><section class="space-y-4"><div class="holo-card rounded-2xl p-6"><div class="flex items-start justify-between"><div><h3 class="text-white font-semibold">Interface glow</h3><p class="text-xs text-gray-500 mt-1">Enable animated lighting and ambient effects.</p></div><div class="toggle-pill on"><span></span></div></div></div>${[['Auto metadata','Fetch title, preview image and description when a URL is saved.','on'],['AI categorization','Automatically suggest tags and categories for new links.','on'],['Compact cards','Use denser cards to show more links on screen.',''],['Broken-link scan','Periodically mark links that no longer respond.','on']].map(([title,desc,on])=>`<div class="holo-card rounded-2xl p-6"><div class="flex items-center justify-between gap-6"><div><h3 class="text-white text-sm font-medium">${title}</h3><p class="text-[11px] text-gray-600 mt-1">${desc}</p></div><div class="toggle-pill ${on}"><span></span></div></div></div>`).join('')}<div class="holo-card rounded-2xl p-6 border-red-500/10"><div class="flex justify-between items-center"><div><h3 class="text-red-300 text-sm font-medium">Reset local library</h3><p class="text-[11px] text-gray-600 mt-1">Remove local saved data and restore default preferences.</p></div><button class="px-4 py-2 rounded-lg border border-red-500/20 bg-red-500/5 text-red-300 text-[10px]">Reset</button></div></div></section></div>
+            </div>`;
+
+        const pages = {
+            'home': homeContent,
+            'search': searchContent,
+            'favorites': favoritesContent,
+            'collections': collectionsContent,
+            'workspaces': workspacesContent,
+            'analytics': analyticsContent,
+            'import-export': importExportContent,
+            'settings': settingsContent,
+        };
+
+        // --- NEW & KEPT: Logic for Paste, Auto Save, Auto Categorize & Real Data Fetching ---
+
+        // 1. จำลองการแยกหมวดหมู่จาก URL (ฟังก์ชันดั้งเดิมของคุณ - เก็บไว้ใช้ร่วมกัน)
+        function simulateCategorization(url) {
+            try {
+                const urlObj = new URL(url);
+                const domain = urlObj.hostname.replace('www.', '');
+                const nameInfo = domain.split('.')[0];
+                const title = nameInfo.charAt(0).toUpperCase() + nameInfo.slice(1);
+
+                // กำหนดหมวดหมู่จำลองตาม Keyword ใน Domain
+                let categoryData = {
+                    title: title,
+                    domain: domain,
+                    icon: 'link', 
+                    iconColor: 'gray-500', // Default color
+                    bgGradient: 'from-gray-700 to-gray-900',
+                    tags: ['uncategorized']
+                };
+
+                // กฎจำลองการแยกหมวดหมู่
+                if (domain.includes('openai.com') || domain.includes('chatgpt.com')) {
+                    categoryData.icon = 'robot';
+                    categoryData.iconColor = '[#10a37f]';
+                    categoryData.bgGradient = 'from-[#0f5742] via-[#2ba57b] to-[#b3e3ce]';
+                    categoryData.tags = ['AI', 'chatbot', 'Automated'];
+                } 
+                else if (domain.includes('github.com')) {
+                    categoryData.icon = 'github-logo';
+                    categoryData.iconColor = 'white';
+                    categ
