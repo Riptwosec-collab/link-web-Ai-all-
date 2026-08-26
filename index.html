@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#050508" />
   <meta name="description" content="Smart Link Hub — local-first intelligent web library" />
-  <link rel="manifest" href="manifest.webmanifest?v=4.2.1" />
+  <link rel="manifest" href="manifest.webmanifest?v=5.0.0" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon.svg" />
-  <title>Smart Link Hub V4.2.1</title>
+  <title>Smart Link Hub V5.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,9 +17,10 @@
   <script>
     tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{dark:'#050508',panel:'#101118',accent:'#3b82f6',cyan:'#22d3ee',violet:'#8b5cf6'}}}}}
   </script>
-  <link rel="stylesheet" href="css/app.css?v=4.2.1" />
-  <link rel="stylesheet" href="css/performance-v5.css?v=4.2.1" />
-  <link rel="stylesheet" href="css/card-v12.css?v=4.2.1" />
+  <link rel="stylesheet" href="css/app.css?v=5.0.0" />
+  <link rel="stylesheet" href="css/performance-v5.css?v=5.0.0" />
+  <link rel="stylesheet" href="css/card-v12.css?v=5.0.0" />
+  <link rel="stylesheet" href="css/nav-v5.css?v=5.0.0" />
 </head>
 <body class="h-[100dvh] overflow-hidden bg-brand-dark text-slate-200 antialiased">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div><div class="noise"></div>
@@ -32,17 +33,15 @@
         </button>
       </div>
       <nav id="sidebar-nav" class="px-3 flex-1 overflow-y-auto space-y-1">
+        <div class="nav-label">Main</div>
         <button class="nav-item active" data-page="home"><i class="ph-fill ph-house"></i><span>Home</span></button>
-        <button class="nav-item" data-page="search"><i class="ph ph-magnifying-glass"></i><span>Search</span><kbd>⌘K</kbd></button>
-        <button class="nav-item" data-page="favorites"><i class="ph ph-star"></i><span>Favorites</span></button>
+        <button class="nav-item" data-page="search"><i class="ph ph-squares-four"></i><span>Library</span></button>
         <button class="nav-item" data-page="collections"><i class="ph ph-folders"></i><span>Collections</span></button>
-        <button class="nav-item" data-page="workspaces"><i class="ph ph-users-three"></i><span>Workspaces</span></button>
+        <button class="nav-item" data-page="favorites"><i class="ph ph-star"></i><span>Favorites</span></button>
         <div class="nav-label">Insights</div>
-        <button class="nav-item" data-page="analytics"><i class="ph ph-chart-line-up"></i><span>Analytics</span></button>
-        <button class="nav-item" data-page="health"><i class="ph ph-heartbeat"></i><span>Link Health</span></button>
-        <button class="nav-item" data-page="archive"><i class="ph ph-archive"></i><span>Archive</span></button>
+        <button class="nav-item" data-page="analytics"><i class="ph ph-chart-line-up"></i><span>Insights</span></button>
         <div class="nav-label">System</div>
-        <button class="nav-item" data-page="import-export"><i class="ph ph-arrows-down-up"></i><span>Import / Export</span></button>
+        <button class="nav-item" data-page="workspaces"><i class="ph ph-dots-three-circle"></i><span>More</span></button>
         <button class="nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></button>
       </nav>
       <div class="p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
@@ -54,9 +53,23 @@
     </aside>
 
     <main class="min-w-0 flex-1 h-full flex flex-col">
-      <header class="topbar h-16 shrink-0 px-5 md:px-8 flex items-center justify-between border-b border-white/[.04] bg-black/10 backdrop-blur-xl">
-        <div class="flex items-center gap-3 min-w-0"><button id="mobile-menu" class="icon-btn md:hidden"><i class="ph ph-list"></i></button><div><div id="page-eyebrow" class="text-[9px] uppercase tracking-[.24em] text-cyan-300/60">Library</div><h1 id="page-title" class="text-sm font-semibold text-white truncate">Home</h1></div></div>
-        <div class="flex items-center gap-2"><button id="command-btn" class="command-trigger hidden sm:flex"><i class="ph ph-command"></i><span>Command</span><kbd>⌘K</kbd></button><button id="add-link-btn" class="icon-btn accent" title="Add link"><i class="ph ph-plus"></i></button><button id="install-btn" class="icon-btn hidden" title="Install app"><i class="ph ph-download-simple"></i></button></div>
+      <header class="topbar h-16 shrink-0 px-5 md:px-8 flex items-center border-b border-white/[.04] bg-black/10 backdrop-blur-xl">
+        <div class="v5-header-left flex items-center gap-3 min-w-0">
+          <button id="mobile-menu" class="icon-btn md:hidden"><i class="ph ph-list"></i></button>
+          <div><div id="page-eyebrow" class="text-[9px] uppercase tracking-[.24em] text-cyan-300/60">Library</div><h1 id="page-title" class="text-sm font-semibold text-white truncate">Home</h1></div>
+        </div>
+        <div class="v5-header-center">
+          <label class="v5-global-search" for="global-search">
+            <i class="ph ph-magnifying-glass"></i>
+            <input id="global-search" type="search" placeholder="Search links, collections, tags…" autocomplete="off" spellcheck="false" />
+            <kbd>⌘K</kbd>
+          </label>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="command-btn" class="command-trigger hidden lg:flex"><i class="ph ph-command"></i><span>Command</span><kbd>⌘K</kbd></button>
+          <button id="add-link-btn" class="icon-btn accent" title="Add link"><i class="ph ph-plus"></i></button>
+          <button id="install-btn" class="icon-btn hidden" title="Install app"><i class="ph ph-download-simple"></i></button>
+        </div>
       </header>
       <section id="dynamic-content" class="flex-1 min-h-0 overflow-y-auto px-4 md:px-8 py-6 md:py-8"></section>
     </main>
@@ -66,10 +79,11 @@
   <div id="command-overlay" class="command-overlay hidden" aria-hidden="true"></div>
   <input id="import-file" type="file" accept=".json,.csv,.html,.htm" class="hidden" />
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
-  <script src="js/auth-gate.js?v=4.2.1"></script>
-  <script type="module" src="js/app.js?v=4.2.1"></script>
-  <script type="module" src="js/instant-save-v9.js?v=4.2.1"></script>
-  <script type="module" src="js/metadata-repair.js?v=4.2.1"></script>
-  <script type="module" src="js/card-v12.js?v=4.2.1"></script>
+  <script src="js/auth-gate.js?v=5.0.0"></script>
+  <script type="module" src="js/app.js?v=5.0.0"></script>
+  <script type="module" src="js/nav-v5.js?v=5.0.0"></script>
+  <script type="module" src="js/instant-save-v9.js?v=5.0.0"></script>
+  <script type="module" src="js/metadata-repair.js?v=5.0.0"></script>
+  <script type="module" src="js/card-v12.js?v=5.0.0"></script>
 </body>
 </html>
