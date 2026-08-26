@@ -1,34 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Link Hub</title>
-  <style>
-    html,body{margin:0;min-height:100%;background:#050508;color:#e2e8f0;font-family:Inter,system-ui,sans-serif}
-    #boot{min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 50% 0%,rgba(14,165,233,.14),transparent 45%),#050508}
-    .boot-card{padding:24px 28px;border:1px solid rgba(255,255,255,.08);border-radius:20px;background:rgba(17,18,24,.82);backdrop-filter:blur(18px);box-shadow:0 20px 70px rgba(0,0,0,.35)}
-    .dot{display:inline-block;width:8px;height:8px;margin-right:10px;border-radius:50%;background:#22d3ee;box-shadow:0 0 18px #22d3ee;animation:pulse 1s ease-in-out infinite alternate}
-    @keyframes pulse{to{opacity:.35;transform:scale(.7)}}
-  </style>
-</head>
-<body>
-  <div id="boot"><div class="boot-card"><span class="dot"></span>Loading Smart Link Hub…</div></div>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#050508" />
+  <meta name="description" content="Smart Link Hub — local-first intelligent web library" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
+  <title>Smart Link Hub V3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    (async () => {
-      const files = Array.from({ length: 9 }, (_, i) => `parts/part-${String(i).padStart(2, '0')}.txt`);
-      const responses = await Promise.all(files.map(file => fetch(file, { cache: 'no-store' })));
-      const failed = responses.findIndex(r => !r.ok);
-      if (failed !== -1) throw new Error(`Unable to load ${files[failed]} (${responses[failed].status})`);
-      const parts = await Promise.all(responses.map(r => r.text()));
-      const html = parts.join('');
-      document.open();
-      document.write(html);
-      document.close();
-    })().catch(error => {
-      console.error(error);
-      document.getElementById('boot').innerHTML = `<div class="boot-card">Unable to start Smart Link Hub<br><small>${String(error)}</small></div>`;
-    });
+    tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{dark:'#050508',panel:'#101118',accent:'#3b82f6',cyan:'#22d3ee',violet:'#8b5cf6'}}}}}
   </script>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body class="h-[100dvh] overflow-hidden bg-brand-dark text-slate-200 antialiased">
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div><div class="noise"></div>
+  <div id="app" class="relative z-10 h-full flex">
+    <aside id="sidebar" class="sidebar w-[260px] shrink-0 h-full flex flex-col border-r border-white/[.06] bg-[#090a10]/80 backdrop-blur-2xl">
+      <div class="px-5 pt-[max(20px,env(safe-area-inset-top))] pb-4">
+        <button data-page="home" class="brand-button flex items-center gap-3 w-full text-left">
+          <div class="brand-mark"><i class="ph-fill ph-link-simple text-white"></i></div>
+          <div><div class="font-semibold text-white tracking-tight">Smart Link Hub</div><div class="text-[9px] text-cyan-300/70 tracking-[.22em] uppercase">Intelligent library</div></div>
+        </button>
+      </div>
+      <nav id="sidebar-nav" class="px-3 flex-1 overflow-y-auto space-y-1">
+        <button class="nav-item active" data-page="home"><i class="ph-fill ph-house"></i><span>Home</span></button>
+        <button class="nav-item" data-page="search"><i class="ph ph-magnifying-glass"></i><span>Search</span><kbd>⌘K</kbd></button>
+        <button class="nav-item" data-page="favorites"><i class="ph ph-star"></i><span>Favorites</span></button>
+        <button class="nav-item" data-page="collections"><i class="ph ph-folders"></i><span>Collections</span></button>
+        <button class="nav-item" data-page="workspaces"><i class="ph ph-users-three"></i><span>Workspaces</span></button>
+        <div class="nav-label">Insights</div>
+        <button class="nav-item" data-page="analytics"><i class="ph ph-chart-line-up"></i><span>Analytics</span></button>
+        <button class="nav-item" data-page="health"><i class="ph ph-heartbeat"></i><span>Link Health</span></button>
+        <button class="nav-item" data-page="archive"><i class="ph ph-archive"></i><span>Archive</span></button>
+        <div class="nav-label">System</div>
+        <button class="nav-item" data-page="import-export"><i class="ph ph-arrows-down-up"></i><span>Import / Export</span></button>
+        <button class="nav-item" data-page="settings"><i class="ph ph-gear-six"></i><span>Settings</span></button>
+      </nav>
+      <div class="p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+        <div class="glass-panel p-4 rounded-2xl">
+          <div class="flex items-center justify-between"><span class="text-[10px] text-slate-500 uppercase tracking-widest">Library</span><span id="sync-pill" class="status-pill local"><span></span>Local</span></div>
+          <div class="grid grid-cols-3 gap-2 mt-3 text-center"><div><b id="side-links">0</b><small>Links</small></div><div><b id="side-favs">0</b><small>Favs</small></div><div><b id="side-cols">0</b><small>Lists</small></div></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="min-w-0 flex-1 h-full flex flex-col">
+      <header class="topbar h-16 shrink-0 px-5 md:px-8 flex items-center justify-between border-b border-white/[.04] bg-black/10 backdrop-blur-xl">
+        <div class="flex items-center gap-3 min-w-0"><button id="mobile-menu" class="icon-btn md:hidden"><i class="ph ph-list"></i></button><div><div id="page-eyebrow" class="text-[9px] uppercase tracking-[.24em] text-cyan-300/60">Library</div><h1 id="page-title" class="text-sm font-semibold text-white truncate">Home</h1></div></div>
+        <div class="flex items-center gap-2"><button id="command-btn" class="command-trigger hidden sm:flex"><i class="ph ph-command"></i><span>Command</span><kbd>⌘K</kbd></button><button id="add-link-btn" class="icon-btn accent" title="Add link"><i class="ph ph-plus"></i></button><button id="install-btn" class="icon-btn hidden" title="Install app"><i class="ph ph-download-simple"></i></button></div>
+      </header>
+      <section id="dynamic-content" class="flex-1 min-h-0 overflow-y-auto px-4 md:px-8 py-6 md:py-8"></section>
+    </main>
+  </div>
+
+  <div id="modal-root"></div><div id="toast-root" class="toast-root"></div>
+  <div id="command-overlay" class="command-overlay hidden" aria-hidden="true"></div>
+  <input id="import-file" type="file" accept=".json,.csv,.html,.htm" class="hidden" />
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
