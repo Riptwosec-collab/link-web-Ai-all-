@@ -1,7 +1,7 @@
-const CACHE='slh-v4.2.1-feature-badge-v12';
+const CACHE='slh-v5.0.0-navigation-refresh';
 const CORE=[
-  './','./index.html','./css/app.css','./css/performance-v5.css','./css/card-v12.css',
-  './js/app.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v12.js','./js/cloud.js',
+  './','./index.html','./css/app.css','./css/performance-v5.css','./css/card-v12.css','./css/nav-v5.css',
+  './js/app.js','./js/nav-v5.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v12.js','./js/cloud.js',
   './manifest.webmanifest','./icons/icon.svg'
 ];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
