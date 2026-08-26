@@ -1,6 +1,6 @@
-const CACHE='slh-v3.5.0-performance-logo';
+const CACHE='slh-v3.6.0-brand-intelligence';
 const CORE=[
-  './','./index.html','./css/app.css','./css/preview-v4.css','./css/save-effects.css','./css/performance-v5.css',
+  './','./index.html','./css/app.css','./css/preview-v4.css','./css/save-effects.css','./css/performance-v5.css','./css/brand-cover-v6.css',
   './js/app.js','./js/instant-save.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-repair.js','./js/cloud.js',
   './manifest.webmanifest','./icons/icon.svg'
 ];
