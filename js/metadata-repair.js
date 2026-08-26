@@ -1,7 +1,7 @@
 import {getAll,putOne,getSetting,logEvent} from './db.js';
 import {getMetadata,displayHost} from './metadata-v9.js';
 
-const DATA_VERSION=10;
+const DATA_VERSION=11;
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 const tlds=new Set(['com','net','org','co','th','io','ai','app','dev','xyz','site','online','me','info','biz','cc','tv','shop','store']);
 const generic=v=>/^(?:no description|untitled|home)$/i.test(String(v||'').trim())||/website or online service|general website|online service from/i.test(String(v||''));
@@ -18,7 +18,7 @@ function merge(link,m,{mark=true}={}){
   const now=Date.now(),description=generic(m?.description)?'':(m?.description||link.description||''),summary=generic(m?.summary)?'':(m?.summary||description||link.summary||'');
   const next={...link,
     title:m?.title||link.title,domain:m?.domain||link.domain,description,summary,
-    imageUrl:m?.imageUrl||link.imageUrl||'',heroImageUrl:m?.heroImageUrl||link.heroImageUrl||'',featureImageUrl:m?.featureImageUrl||link.featureImageUrl||'',featureLogoUrl:m?.featureLogoUrl||m?.featureImageUrl||link.featureLogoUrl||'',
+    imageUrl:m?.imageUrl||link.imageUrl||'',screenshotUrl:m?.screenshotUrl||link.screenshotUrl||'',heroImageUrl:m?.heroImageUrl||link.heroImageUrl||'',featureImageUrl:m?.featureImageUrl||link.featureImageUrl||'',featureLogoUrl:m?.featureLogoUrl||m?.featureImageUrl||link.featureLogoUrl||'',
     favicon:m?.favicon||link.favicon||'',logoUrl:m?.logoUrl||link.logoUrl||'',touchIconUrl:m?.touchIconUrl||link.touchIconUrl||'',manifestIconUrl:m?.manifestIconUrl||link.manifestIconUrl||'',
     themeColor:m?.themeColor||link.themeColor||'',brandKind:m?.brandKind||link.brandKind||'',brandAssetUrl:m?.brandAssetUrl||link.brandAssetUrl||'',category:m?.category||link.category||'General',metadataSource:m?.source||link.metadataSource||'',
     cardDataVersion:mark?DATA_VERSION:Number(link.cardDataVersion||0),cardDataScannedAt:mark?now:(link.cardDataScannedAt||0),updatedAt:now
@@ -27,8 +27,8 @@ function merge(link,m,{mark=true}={}){
 }
 function refreshCards(){window.dispatchEvent(new Event('smartlink:data-updated'))}
 async function scanOne(link,cfg){
-  try{const m=await getMetadata(link.url,cfg),next=merge(link,m);await putOne('links',next);await logEvent('metadata_v10',{id:link.id,source:m?.source||'unknown',brandKind:next.brandKind||'unknown',hasFeatureLogo:!!next.featureLogoUrl});return true}
-  catch(err){console.warn('V10 metadata scan failed',link.url,err);const now=Date.now(),next={...link,tags:cleanTags(link),cardDataVersion:DATA_VERSION,cardDataScannedAt:now,cardDataScanFailed:true,updatedAt:now};if(generic(next.description))next.description='';if(generic(next.summary))next.summary='';await putOne('links',next);return false}
+  try{const m=await getMetadata(link.url,cfg),next=merge(link,m);await putOne('links',next);await logEvent('metadata_v11',{id:link.id,source:m?.source||'unknown',brandKind:next.brandKind||'unknown',hasBackground:!!(next.heroImageUrl||next.featureImageUrl||next.imageUrl||next.screenshotUrl)});return true}
+  catch(err){console.warn('V11 metadata scan failed',link.url,err);const now=Date.now(),next={...link,tags:cleanTags(link),cardDataVersion:DATA_VERSION,cardDataScannedAt:now,cardDataScanFailed:true,updatedAt:now};if(generic(next.description))next.description='';if(generic(next.summary))next.summary='';await putOne('links',next);return false}
 }
 async function migrateAll(){
   if(!(await waitForUnlock()))return;
