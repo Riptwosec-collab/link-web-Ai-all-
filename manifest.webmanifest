@@ -1,0 +1,1 @@
+{"name":"Smart Link Hub","short_name":"Link Hub","description":"Local-first intelligent web library","start_url":"./","scope":"./","display":"standalone","background_color":"#050508","theme_color":"#050508","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
