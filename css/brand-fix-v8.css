@@ -1,0 +1,51 @@
+/* Smart Link Hub V3.8 — strict brand-safe cover fallback */
+.brand-logo-cover.brand-fix-v8{background:#0b0f18!important;overflow:hidden!important;isolation:isolate}
+.brand-logo-cover.brand-fix-v8[data-has-theme="1"][data-brand-kind="logo"],
+.brand-logo-cover.brand-fix-v8[data-has-theme="1"][data-brand-kind="icon"],
+.brand-logo-cover.brand-fix-v8[data-has-theme="1"][data-brand-kind="text"]{
+  background:linear-gradient(145deg,color-mix(in srgb,var(--site-theme) 46%,#0b0f18),color-mix(in srgb,var(--site-theme) 18%,#05070d))!important;
+}
+.brand-logo-cover.brand-fix-v8[data-has-theme="0"][data-brand-kind="logo"],
+.brand-logo-cover.brand-fix-v8[data-has-theme="0"][data-brand-kind="icon"],
+.brand-logo-cover.brand-fix-v8[data-has-theme="0"][data-brand-kind="text"]{
+  background:linear-gradient(145deg,#111827 0%,#0b1019 52%,#06090f 100%)!important;
+}
+.brand-v8-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(circle at 20% 18%,rgba(255,255,255,.07),transparent 32%),radial-gradient(circle at 82% 78%,rgba(255,255,255,.035),transparent 36%);pointer-events:none}
+.brand-v8-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(3,6,12,.74),rgba(3,6,12,.12) 58%,rgba(3,6,12,.24));pointer-events:none}
+
+/* Real logo: keep logo crisp, never stretch it into the background. */
+.brand-v8-logo-box,.brand-v8-icon-box,.brand-v8-text-box{position:absolute;left:50%;top:43%;z-index:2;transform:translate(-50%,-50%);display:grid;place-items:center;border:1px solid rgba(255,255,255,.12);background:rgba(7,11,19,.72);box-shadow:0 14px 34px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.055)}
+.brand-v8-logo-box{width:112px;height:78px;padding:13px 16px;border-radius:20px}
+.brand-v8-logo-main{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;object-fit:contain!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important}
+.brand-v8-logo-box>span,.brand-v8-icon-box>span,.brand-v8-text-box>span{position:absolute;right:-7px;bottom:-7px;height:24px;padding:0 7px;border-radius:8px;display:grid;place-items:center;background:rgba(2,6,13,.86);border:1px solid rgba(255,255,255,.10);font-size:6px;font-weight:800;letter-spacing:.11em;color:#cbd5e1}
+
+/* Icon-only sites: icon stays small and sharp on a neutral/themed surface. */
+.brand-v8-icon-box{width:76px;height:76px;padding:13px;border-radius:22px}
+.brand-v8-icon-main{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;object-fit:contain!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important;border-radius:13px}
+.brand-v8-text-box{width:74px;height:74px;border-radius:21px}
+.brand-v8-text-box>b{font-size:20px;letter-spacing:.06em;color:#e2e8f0}
+
+/* Feature fallback: the website's own hero/key art becomes the background and focal asset. */
+.brand-logo-cover.brand-fix-v8[data-brand-kind="feature"]{background:#080c14!important}
+.brand-v8-feature-bg{position:absolute!important;inset:-3%!important;z-index:0!important;width:106%!important;height:106%!important;object-fit:cover!important;opacity:.48!important;filter:saturate(1.02) brightness(.58)!important;transform:scale(1.02)!important;animation:none!important}
+.brand-logo-cover.brand-fix-v8[data-brand-kind="feature"] .brand-v8-shade{background:linear-gradient(to top,rgba(2,6,14,.84),rgba(2,6,14,.24) 56%,rgba(2,6,14,.34))}
+.brand-v8-feature-box{position:absolute;left:50%;top:43%;z-index:2;transform:translate(-50%,-50%);width:min(64%,200px);height:92px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14);background:#080c14;box-shadow:0 14px 30px rgba(0,0,0,.28)}
+.brand-v8-feature-main{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;opacity:1!important;filter:none!important;transform:none!important;animation:none!important}
+.brand-v8-feature-box>span{position:absolute;left:8px;bottom:8px;z-index:3;padding:4px 7px;border-radius:7px;background:rgba(2,6,13,.78);border:1px solid rgba(255,255,255,.08);font-size:6px;font-weight:800;letter-spacing:.12em;color:#e2e8f0}
+
+/* Never show the old blurred favicon/logo backdrop after V3.8 has patched a card. */
+.brand-logo-cover.brand-fix-v8 .brand-logo-bg,.brand-logo-cover.brand-fix-v8 .brand-logo-main,.brand-logo-cover.brand-fix-v8 .brand-feature-bg,.brand-logo-cover.brand-fix-v8 .brand-feature-main{display:none!important}
+
+.preview.use-brand-cover>.brand-logo-cover.brand-fix-v8{opacity:1!important}
+.preview.use-logo-cover>.brand-logo-cover.brand-fix-v8{opacity:1!important}
+.preview.use-photo-cover>.brand-logo-cover.brand-fix-v8{opacity:0!important}
+.preview.use-photo-cover>.preview-image,.preview.use-photo-cover>img{display:block!important}
+
+@media(max-width:767px){
+  .brand-v8-logo-box{width:98px;height:70px;border-radius:18px}
+  .brand-v8-icon-box{width:68px;height:68px;border-radius:19px}
+  .brand-v8-feature-box{width:min(68%,175px);height:80px;border-radius:16px}
+}
+@supports not (color:color-mix(in srgb,#000,#fff)){
+  .brand-logo-cover.brand-fix-v8[data-has-theme="1"]{background:linear-gradient(145deg,var(--site-theme,#111827),#070b12)!important}
+}
