@@ -1,0 +1,33 @@
+/* Smart Link Hub V5 navigation refresh */
+.topbar{gap:18px}
+.v5-header-left{min-width:150px;flex:0 0 auto}
+.v5-header-center{flex:1;min-width:0;display:flex;justify-content:center}
+.v5-global-search{position:relative;width:min(560px,100%);height:40px;display:flex;align-items:center;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.035);border-radius:14px;transition:border-color .18s ease,background .18s ease,box-shadow .18s ease}
+.v5-global-search.focused,.v5-global-search:focus-within{border-color:rgba(34,211,238,.22);background:rgba(255,255,255,.045);box-shadow:0 0 0 3px rgba(34,211,238,.035)}
+.v5-global-search>i{position:absolute;left:13px;color:#67e8f9;font-size:15px;pointer-events:none}
+.v5-global-search input{width:100%;height:100%;padding:0 78px 0 38px;border:0;outline:0;background:transparent;color:#e5edf8;font-size:11px}
+.v5-global-search input::placeholder{color:#475569}
+.v5-global-search kbd{position:absolute;right:9px;top:50%;transform:translateY(-50%);padding:3px 7px;border:1px solid rgba(255,255,255,.07);border-radius:7px;background:rgba(255,255,255,.035);color:#64748b;font-size:8px}
+
+#sidebar-nav .nav-label{margin-top:18px}
+#sidebar-nav .nav-item{position:relative}
+#sidebar-nav .nav-item.active:before{content:"";position:absolute;left:-3px;top:9px;bottom:9px;width:2px;border-radius:99px;background:#22d3ee;box-shadow:0 0 12px rgba(34,211,238,.36)}
+
+.v5-context-tabs{display:flex;align-items:center;gap:6px;width:max-content;max-width:100%;padding:4px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.025);border-radius:14px;overflow-x:auto;scrollbar-width:none}
+.v5-context-tabs::-webkit-scrollbar{display:none}
+.v5-context-tab{height:32px;padding:0 11px;border:0;border-radius:10px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;color:#64748b;background:transparent;font-size:9px;font-weight:600;transition:color .16s ease,background .16s ease,transform .16s ease}
+.v5-context-tab i{font-size:13px}
+.v5-context-tab:hover{color:#cbd5e1;background:rgba(255,255,255,.04)}
+.v5-context-tab.active{color:#dffaff;background:rgba(34,211,238,.09);box-shadow:inset 0 0 0 1px rgba(34,211,238,.11)}
+.v5-context-tab:active{transform:scale(.98)}
+
+@media(max-width:1023px){
+  .v5-global-search{width:min(420px,100%)}
+}
+@media(max-width:767px){
+  .v5-header-center{display:none}
+  .topbar{gap:10px}
+  #sidebar{width:min(286px,86vw)}
+  .v5-context-tabs{width:100%}
+}
+@media(prefers-reduced-motion:reduce){.v5-global-search,.v5-context-tab{transition:none}}
