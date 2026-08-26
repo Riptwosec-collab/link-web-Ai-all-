@@ -1,9 +1,10 @@
-const CACHE='slh-v3.3.0-instant-preview';
+const CACHE='slh-v3.4.0-smart-cover';
 const CORE=[
   './',
   './index.html',
   './css/app.css',
   './css/preview-v4.css',
+  './css/save-effects.css',
   './js/app.js',
   './js/instant-save.js',
   './js/auth-gate.js',
