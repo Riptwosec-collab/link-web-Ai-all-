@@ -1,4 +1,4 @@
-import {getAll} from './db.js';
+import {getAll,getOne} from './db.js';
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const genericText=v=>/^(?:no description|untitled|home)$/i.test(String(v||'').trim())||/website or online service|general website|online service from/i.test(String(v||''));
@@ -70,14 +70,17 @@ function backgroundHTML(link){
 }
 function brandBadge(link){
   const logo=realLogo(link),art=feature(link),icon=qualityIcon(link);
-  if(logo)return `<div class="v12-brand-badge is-logo"><img class="v12-brand-img" src="${esc(logo)}" alt=""><span class="v12-brand-initials hidden">${esc(initials(link))}</span></div>`;
+  if(logo)return `<div class="v12-brand-badge is-logo"><img class="v12-brand-img" src="${esc(logo)}" alt="" loading="lazy" decoding="async"><span class="v12-brand-initials hidden">${esc(initials(link))}</span></div>`;
   if(art)return `<div class="v12-brand-badge is-feature"><img class="v12-brand-img is-feature-img" src="${esc(art)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span class="v12-brand-initials hidden">${esc(initials(link))}</span></div>`;
-  if(icon)return `<div class="v12-brand-badge is-icon"><img class="v12-brand-img" src="${esc(icon)}" alt=""><span class="v12-brand-initials hidden">${esc(initials(link))}</span></div>`;
+  if(icon)return `<div class="v12-brand-badge is-icon"><img class="v12-brand-img" src="${esc(icon)}" alt="" loading="lazy" decoding="async"><span class="v12-brand-initials hidden">${esc(initials(link))}</span></div>`;
   return `<div class="v12-brand-badge is-text"><span class="v12-brand-initials">${esc(initials(link))}</span></div>`;
+}
+function actionHTML(link){
+  return `<div class="link-menu v12-menu flex gap-1"><button class="card-action v53-star ${link.favorite?'active':''}" data-v53="favorite" aria-label="Favorite"><i class="${link.favorite?'ph-fill':'ph'} ph-star"></i></button><button class="card-action v53-more" data-v53="more" aria-label="More actions"><i class="ph ph-dots-three"></i></button><button class="v53-legacy-hook" data-action="edit" tabindex="-1" aria-hidden="true"></button></div>`;
 }
 function previewHTML(link){
   const category=esc(link.category&&link.category!=='Loading'?link.category:'General');
-  return `${backgroundHTML(link)}<div class="v12-cover-shade"></div><div class="v12-brand-row">${brandBadge(link)}<div class="v12-title-copy"><p>${category}</p><h3>${esc(link.title||host(link))}</h3></div></div><div class="link-menu v12-menu flex gap-1"><button class="card-action favorite-btn ${link.favorite?'active':''}" data-action="favorite" aria-label="Favorite"><i class="${link.favorite?'ph-fill':'ph'} ph-star"></i></button><button class="card-action" data-action="edit" aria-label="Edit"><i class="ph ph-pencil-simple"></i></button><button class="card-action" data-refresh-metadata="1" aria-label="Refresh metadata" title="Refresh metadata"><i class="ph ph-arrows-clockwise"></i></button></div>${link.pending?'<span class="v12-loading-pill"><i class="ph ph-circle-notch"></i> Loading</span>':''}`;
+  return `${backgroundHTML(link)}<div class="v12-cover-shade"></div><div class="v12-brand-row">${brandBadge(link)}<div class="v12-title-copy"><p>${category}</p><h3>${esc(link.title||host(link))}</h3></div></div>${actionHTML(link)}${link.pending?'<span class="v12-loading-pill"><i class="ph ph-circle-notch"></i> Loading</span>':''}`;
 }
 function bodyHTML(link,col){
   const tags=filteredTags(link);
@@ -90,44 +93,50 @@ function validateMedia(card){
   if(bg){
     const fail=()=>preview.classList.add('v12-photo-failed');
     const decide=()=>{const w=bg.naturalWidth||0,h=bg.naturalHeight||0,ratio=h?w/h:99;const good=w>=320&&h>=160&&w*h>=85000&&ratio<6&&ratio>.42;if(!good)fail()};
-    bg.addEventListener('load',decide,{once:true});bg.addEventListener('error',fail,{once:true});if(bg.complete)requestAnimationFrame(decide);
+    bg.addEventListener('load',decide,{once:true});bg.addEventListener('error',fail,{once:true});if(bg.complete&&bg.naturalWidth)decide();
   }
   const mark=preview.querySelector('.v12-brand-img');
   if(mark){
-    const badge=mark.closest('.v12-brand-badge');
-    const isFeature=badge?.classList.contains('is-feature');
-    const fail=()=>{
-      mark.classList.add('hidden');
-      mark.nextElementSibling?.classList.remove('hidden');
-      badge?.classList.remove('is-logo','is-icon','is-feature');
-      badge?.classList.add('is-text');
-    };
-    const decide=()=>{
-      const w=mark.naturalWidth||0,h=mark.naturalHeight||0;
-      const good=isFeature?(w>=80&&h>=80&&w*h>=12000):(w>=24&&h>=24);
-      if(!good)fail();
-    };
-    mark.addEventListener('error',fail,{once:true});
-    mark.addEventListener('load',decide,{once:true});
-    if(mark.complete&&mark.naturalWidth)requestAnimationFrame(decide);
+    const badge=mark.closest('.v12-brand-badge'),isFeature=badge?.classList.contains('is-feature');
+    const fail=()=>{mark.classList.add('hidden');mark.nextElementSibling?.classList.remove('hidden');badge?.classList.remove('is-logo','is-icon','is-feature');badge?.classList.add('is-text')};
+    const decide=()=>{const w=mark.naturalWidth||0,h=mark.naturalHeight||0;const good=isFeature?(w>=80&&h>=80&&w*h>=12000):(w>=24&&h>=24);if(!good)fail()};
+    mark.addEventListener('error',fail,{once:true});mark.addEventListener('load',decide,{once:true});if(mark.complete&&mark.naturalWidth)decide();
   }
+}
+function applyCard(card,link,col){
+  if(!card||!link)return;
+  const stamp=`12.3:${link.updatedAt||0}:${link.favorite?1:0}:${link.pending?1:0}`;
+  if(card.dataset.v12Stamp===stamp)return;
+  card.dataset.v12Stamp=stamp;card.classList.add('card-v12');card.dataset.linkUrl=link.url||'';
+  const preview=card.querySelector('.preview');
+  if(preview){preview.innerHTML=previewHTML(link);const body=preview.nextElementSibling;if(body)body.outerHTML=bodyHTML(link,col)}
+  validateMedia(card);
+}
+export function renderCardHTML(link,col=null,{draggable=false,compact=false}={}){
+  return `<article class="link-card card-v12 ${compact?'compact':''}" data-link-id="${esc(link.id)}" data-link-url="${esc(link.url||'')}" ${draggable?'draggable="true"':''}><div class="preview">${previewHTML(link)}</div>${bodyHTML(link,col)}</article>`;
+}
+export async function refreshVisibleCard(id){
+  const card=document.querySelector(`.link-card[data-link-id="${CSS.escape(id)}"]`);if(!card)return false;
+  const [link,cols]=await Promise.all([getOne('links',id),getAll('collections')]);if(!link)return false;
+  const cmap=new Map(cols.map(x=>[x.id,x]));applyCard(card,link,cmap.get(link.collectionId));return true;
+}
+export function insertVisibleCard(link){
+  const shell=document.querySelector('#dynamic-content .page-shell');if(!shell)return false;
+  let grid=document.querySelector('#dynamic-content .link-card[data-link-id]')?.parentElement;
+  if(!grid&&location.hash!=='#search')grid=shell.querySelector('section:last-of-type > div.grid');
+  if(!grid)return false;
+  grid.querySelector('.col-span-full')?.remove();
+  const tpl=document.createElement('template');tpl.innerHTML=renderCardHTML(link,null,{draggable:location.hash!=='#search'});const card=tpl.content.firstElementChild;grid.prepend(card);validateMedia(card);document.dispatchEvent(new CustomEvent('smartlink:card-inserted',{detail:{id:link.id}}));return true;
 }
 async function patchCards(){
   queued=false;
-  const cards=[...document.querySelectorAll('.link-card[data-link-id]')];if(!cards.length)return;
+  const cards=[...document.querySelectorAll('.link-card[data-link-id]')];if(!cards.length){document.dispatchEvent(new Event('smartlink:cards-patched'));return}
   const [links,cols]=await Promise.all([getAll('links'),getAll('collections')]);
   const map=new Map(links.map(x=>[x.id,x])),cmap=new Map(cols.map(x=>[x.id,x]));
-  for(const card of cards){
-    const link=map.get(card.dataset.linkId);if(!link)continue;
-    const stamp=`12.1:${link.updatedAt||0}:${link.favorite?1:0}:${link.pending?1:0}`;
-    if(card.dataset.v12Stamp===stamp)continue;
-    card.dataset.v12Stamp=stamp;card.classList.add('card-v12');
-    const preview=card.querySelector('.preview');
-    if(preview){preview.innerHTML=previewHTML(link);const body=preview.nextElementSibling;if(body)body.outerHTML=bodyHTML(link,cmap.get(link.collectionId))}
-    validateMedia(card);
-  }
+  for(const card of cards){const link=map.get(card.dataset.linkId);if(link)applyCard(card,link,cmap.get(link.collectionId))}
+  document.dispatchEvent(new Event('smartlink:cards-patched'));
 }
-function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>setTimeout(patchCards,25))}
-function observe(){const root=document.getElementById('dynamic-content');if(!root)return setTimeout(observe,100);new MutationObserver(schedule).observe(root,{childList:true});schedule()}
+function schedule(){if(queued)return;queued=true;queueMicrotask(patchCards)}
+function observe(){const root=document.getElementById('dynamic-content');if(!root)return setTimeout(observe,80);new MutationObserver(schedule).observe(root,{childList:true});schedule()}
 window.addEventListener('smartlink:data-updated',schedule);
 observe();
