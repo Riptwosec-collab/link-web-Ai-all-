@@ -35,7 +35,7 @@
   document.addEventListener('smartlink:card-inserted',e=>{
     const id=e.detail?.id;if(!id)return;
     const card=document.querySelector(`.link-card[data-link-id="${CSS.escape(id)}"]`);if(!card)return;
-    if(!reduce.matches){card.classList.remove('v54-card-born');void card.offsetWidth;card.classList.add('v54-card-born')}
+    if(!reduce.matches)requestAnimationFrame(()=>card.classList.add('v54-card-born'));
     setSaveState($('#save-url-btn'),'success');
   });
 
