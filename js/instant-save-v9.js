@@ -6,7 +6,7 @@ const CARD_DATA_VERSION=12;
 const inflight=new Set();
 let knownUrls=null;
 let knownPromise=null;
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 
 function toast(text){
   const root=document.getElementById('toast-root');if(!root)return;
@@ -35,6 +35,7 @@ async function hydrate(id,cfg){
     await putOne('links',next);
     logEvent('metadata_refresh',{id,source:next.metadataSource,via:'instant-v12',hasBackground:!!(next.heroImageUrl||next.featureImageUrl||next.imageUrl||next.screenshotUrl)}).catch(()=>{});
     await refreshVisibleCard(id);
+    document.dispatchEvent(new CustomEvent('smartlink:card-ready',{detail:{id}}));
     snapshot(next,cfg);
   }catch(err){
     console.warn('metadata v12',err);
