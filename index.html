@@ -5,22 +5,25 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#050508" />
   <meta name="description" content="Smart Link Hub — local-first intelligent web library" />
-  <link rel="manifest" href="manifest.webmanifest?v=5.0.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=5.1.0" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon.svg" />
-  <title>Smart Link Hub V5.0</title>
+  <title>Smart Link Hub V5.1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://unpkg.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{dark:'#050508',panel:'#101118',accent:'#3b82f6',cyan:'#22d3ee',violet:'#8b5cf6'}}}}}
   </script>
-  <link rel="stylesheet" href="css/app.css?v=5.0.0" />
-  <link rel="stylesheet" href="css/performance-v5.css?v=5.0.0" />
-  <link rel="stylesheet" href="css/card-v12.css?v=5.0.0" />
-  <link rel="stylesheet" href="css/nav-v5.css?v=5.0.0" />
+  <link rel="stylesheet" href="css/app.css?v=5.1.0" />
+  <link rel="stylesheet" href="css/performance-v51.css?v=5.1.0" />
+  <link rel="stylesheet" href="css/card-v12.css?v=5.1.0" />
+  <link rel="stylesheet" href="css/nav-v5.css?v=5.1.0" />
+  <link rel="stylesheet" href="css/premium-v51.css?v=5.1.0" />
 </head>
 <body class="h-[100dvh] overflow-hidden bg-brand-dark text-slate-200 antialiased">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div><div class="noise"></div>
@@ -66,7 +69,7 @@
           </label>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <button id="command-btn" class="command-trigger hidden lg:flex"><i class="ph ph-command"></i><span>Command</span><kbd>⌘K</kbd></button>
+          <button id="command-btn" class="command-trigger hidden lg:flex"><i class="ph ph-command"></i><span>Command</span><kbd>⌘P</kbd></button>
           <button id="add-link-btn" class="icon-btn accent" title="Add link"><i class="ph ph-plus"></i></button>
           <button id="install-btn" class="icon-btn hidden" title="Install app"><i class="ph ph-download-simple"></i></button>
         </div>
@@ -79,11 +82,12 @@
   <div id="command-overlay" class="command-overlay hidden" aria-hidden="true"></div>
   <input id="import-file" type="file" accept=".json,.csv,.html,.htm" class="hidden" />
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
-  <script src="js/auth-gate.js?v=5.0.0"></script>
-  <script type="module" src="js/app.js?v=5.0.0"></script>
-  <script type="module" src="js/nav-v5.js?v=5.0.0"></script>
-  <script type="module" src="js/instant-save-v9.js?v=5.0.0"></script>
-  <script type="module" src="js/metadata-repair.js?v=5.0.0"></script>
-  <script type="module" src="js/card-v12.js?v=5.0.0"></script>
+  <script src="js/auth-gate.js?v=5.1.0"></script>
+  <script type="module" src="js/app.js?v=5.1.0"></script>
+  <script type="module" src="js/nav-v5.js?v=5.1.0"></script>
+  <script type="module" src="js/instant-save-v9.js?v=5.1.0"></script>
+  <script type="module" src="js/metadata-repair.js?v=5.1.0"></script>
+  <script type="module" src="js/card-v12.js?v=5.1.0"></script>
+  <script type="module" src="js/premium-v51-runtime.js?v=5.1.0"></script>
 </body>
 </html>
