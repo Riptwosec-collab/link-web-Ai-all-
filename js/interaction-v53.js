@@ -6,73 +6,18 @@ const $=(q,r=document)=>r.querySelector(q);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let menu=null;
 
-function toast(text,undo){
-  const root=$('#toast-root');if(!root)return;
-  const el=document.createElement('div');el.className='toast v51-toast';el.innerHTML=`<i class="ph-fill ph-check-circle"></i><span>${esc(text)}</span>${undo?'<button class="v51-toast-undo">Undo</button>':''}`;root.append(el);
-  if(undo)$('.v51-toast-undo',el).onclick=async()=>{await undo();el.remove()};
-  setTimeout(()=>el.remove(),2200);
-}
+function toast(text,undo){const root=$('#toast-root');if(!root)return;const el=document.createElement('div');el.className='toast v51-toast';el.innerHTML=`<i class="ph-fill ph-check-circle"></i><span>${esc(text)}</span>${undo?'<button class="v51-toast-undo">Undo</button>':''}`;root.append(el);if(undo)$('.v51-toast-undo',el).onclick=async()=>{await undo();el.remove()};setTimeout(()=>el.remove(),2200)}
 function sideDelta(id,delta){const el=$(id);if(!el)return;const n=parseInt(String(el.textContent||'0').replace(/,/g,''),10)||0;el.textContent=String(Math.max(0,n+delta))}
 function closeMenu(){if(!menu)return;const old=menu;menu=null;old.classList.remove('open');setTimeout(()=>old.remove(),90)}
-function place(anchor,panel){
-  const r=anchor.getBoundingClientRect(),w=218,h=306;
-  panel.style.left=`${Math.min(innerWidth-w-10,Math.max(10,r.right-w))}px`;
-  panel.style.top=`${r.bottom+8+h>innerHeight?Math.max(10,r.top-h-8):r.bottom+8}px`;
-}
-function openMenu(anchor,card){
-  closeMenu();
-  const p=document.createElement('div');p.className='v51-action-menu v53-menu';p.dataset.linkId=card.dataset.linkId;
-  p.innerHTML='<button data-v53-menu="open"><i class="ph ph-arrow-square-out"></i><span>Open link</span><kbd>↗</kbd></button><button data-v53-menu="edit"><i class="ph ph-pencil-simple"></i><span>Edit</span></button><button data-v53-menu="copy"><i class="ph ph-copy"></i><span>Copy URL</span></button><button data-v53-menu="refresh"><i class="ph ph-arrows-clockwise"></i><span>Refresh metadata</span></button><button data-v53-menu="move"><i class="ph ph-folder-simple"></i><span>Move to collection</span></button><div class="v51-menu-rule"></div><button data-v53-menu="archive"><i class="ph ph-archive"></i><span>Archive snapshot</span></button><button class="danger" data-v53-menu="delete"><i class="ph ph-trash"></i><span>Delete</span></button>';
-  document.body.append(p);menu=p;place(anchor,p);requestAnimationFrame(()=>p.classList.add('open'));
-}
-async function persistFavorite(card,btn,next,previous){
-  try{
-    const link=await getOne('links',card.dataset.linkId);if(!link)return;
-    link.favorite=next;link.updatedAt=Date.now();await putOne('links',link);logEvent('favorite',{id:link.id,value:next,via:'v53'}).catch(()=>{});
-  }catch(err){
-    btn.classList.toggle('active',previous);btn.innerHTML=`<i class="${previous?'ph-fill':'ph'} ph-star"></i>`;sideDelta('#side-favs',previous?1:-1);console.warn('favorite persist',err)
-  }
-}
-function favorite(card,btn){
-  const previous=btn.classList.contains('active'),next=!previous;
-  btn.classList.toggle('active',next);btn.innerHTML=`<i class="${next?'ph-fill':'ph'} ph-star"></i>`;sideDelta('#side-favs',next?1:-1);
-  if(location.hash==='#favorites'&&!next){card.classList.add('v53-card-exit');setTimeout(()=>card.remove(),120)}
-  queueMicrotask(()=>persistFavorite(card,btn,next,previous));
-}
+function place(anchor,panel){const r=anchor.getBoundingClientRect(),w=218,h=306;panel.style.left=`${Math.min(innerWidth-w-10,Math.max(10,r.right-w))}px`;panel.style.top=`${r.bottom+8+h>innerHeight?Math.max(10,r.top-h-8):r.bottom+8}px`}
+function openMenu(anchor,card){closeMenu();const p=document.createElement('div');p.className='v51-action-menu v53-menu';p.dataset.linkId=card.dataset.linkId;p.innerHTML='<button data-v53-menu="open"><i class="ph ph-arrow-square-out"></i><span>Open link</span><kbd>↗</kbd></button><button data-v53-menu="edit"><i class="ph ph-pencil-simple"></i><span>Edit</span></button><button data-v53-menu="copy"><i class="ph ph-copy"></i><span>Copy URL</span></button><button data-v53-menu="refresh"><i class="ph ph-arrows-clockwise"></i><span>Refresh metadata</span></button><button data-v53-menu="move"><i class="ph ph-folder-simple"></i><span>Move to collection</span></button><div class="v51-menu-rule"></div><button data-v53-menu="archive"><i class="ph ph-archive"></i><span>Archive snapshot</span></button><button class="danger" data-v53-menu="delete"><i class="ph ph-trash"></i><span>Delete</span></button>';document.body.append(p);menu=p;place(anchor,p);requestAnimationFrame(()=>p.classList.add('open'))}
+async function persistFavorite(card,btn,next,previous){try{const link=await getOne('links',card.dataset.linkId);if(!link)return;link.favorite=next;link.updatedAt=Date.now();await putOne('links',link);logEvent('favorite',{id:link.id,value:next,via:'v53'}).catch(()=>{})}catch(err){btn.classList.toggle('active',previous);btn.innerHTML=`<i class="${previous?'ph-fill':'ph'} ph-star"></i>`;sideDelta('#side-favs',previous?1:-1);console.warn('favorite persist',err)}}
+function favorite(card,btn){const previous=btn.classList.contains('active'),next=!previous;btn.classList.toggle('active',next);btn.innerHTML=`<i class="${next?'ph-fill':'ph'} ph-star"></i>`;sideDelta('#side-favs',next?1:-1);if(location.hash==='#favorites'&&!next){card.classList.add('v53-card-exit');setTimeout(()=>card.remove(),120)}queueMicrotask(()=>persistFavorite(card,btn,next,previous))}
 async function cfg(){const [autoMetadata,aiEnabled,workerUrl]=await Promise.all([getSetting('autoMetadata',true),getSetting('aiEnabled',true),getSetting('workerUrl','')]);return {autoMetadata,aiEnabled,workerUrl}}
-async function refreshMetadata(id){
-  const link=await getOne('links',id);if(!link)return;
-  toast('Refreshing metadata…');
-  try{
-    const m=await getMetadata(link.url,await cfg()),now=Date.now();
-    const next={...link,title:m?.title||link.title,domain:m?.domain||link.domain,description:m?.description||link.description||'',summary:m?.summary||m?.description||link.summary||'',imageUrl:m?.imageUrl||link.imageUrl||'',screenshotUrl:m?.screenshotUrl||link.screenshotUrl||'',heroImageUrl:m?.heroImageUrl||link.heroImageUrl||'',featureImageUrl:m?.featureImageUrl||link.featureImageUrl||'',featureLogoUrl:m?.featureLogoUrl||m?.featureImageUrl||link.featureLogoUrl||'',favicon:m?.favicon||link.favicon||'',logoUrl:m?.logoUrl||link.logoUrl||'',touchIconUrl:m?.touchIconUrl||link.touchIconUrl||'',manifestIconUrl:m?.manifestIconUrl||link.manifestIconUrl||'',themeColor:m?.themeColor||link.themeColor||'',brandKind:m?.brandKind||link.brandKind||'',brandAssetUrl:m?.brandAssetUrl||link.brandAssetUrl||'',category:m?.category||link.category||'General',tags:m?.tags||link.tags||[],pending:false,metadataRefreshedAt:now,updatedAt:now};
-    await putOne('links',next);await refreshVisibleCard(id);logEvent('metadata_refresh',{id,source:m?.source||'manual',via:'v53'}).catch(()=>{});toast('Metadata updated');
-  }catch(err){console.warn(err);toast('Refresh failed')}
-}
-async function moveMenu(anchor,id){
-  closeMenu();
-  const p=document.createElement('div');p.className='v51-action-menu v51-collection-menu v53-menu';p.dataset.linkId=id;p.innerHTML='<div class="v51-menu-head"><b>Move to collection</b><small>Loading…</small></div>';document.body.append(p);menu=p;place(anchor,p);requestAnimationFrame(()=>p.classList.add('open'));
-  const [link,cols]=await Promise.all([getOne('links',id),getAll('collections')]);if(!link||menu!==p)return;
-  p.innerHTML=`<div class="v51-menu-head"><b>Move to collection</b><small>${esc(link.title||link.domain||'Link')}</small></div>`+cols.map(c=>`<button data-v53-collection="${esc(c.id)}" class="${c.id===link.collectionId?'selected':''}"><i class="ph ph-${esc(c.icon||'folder')}"></i><span>${esc(c.name)}</span>${c.id===link.collectionId?'<i class="ph-fill ph-check-circle"></i>':''}</button>`).join('');
-}
-async function chooseCollection(button){
-  const p=button.closest('.v53-menu'),id=p?.dataset.linkId,link=id?await getOne('links',id):null;if(!link)return;
-  link.collectionId=button.dataset.v53Collection;link.updatedAt=Date.now();await putOne('links',link);await refreshVisibleCard(id);logEvent('move_collection',{id,collectionId:link.collectionId,via:'v53'}).catch(()=>{});closeMenu();toast('Moved to collection');
-}
-async function action(button){
-  const p=button.closest('.v53-menu'),id=p?.dataset.linkId;if(!id)return;const card=$(`.link-card[data-link-id="${CSS.escape(id)}"]`),url=card?.dataset.linkUrl||'';const a=button.dataset.v53Menu;
-  if(a==='open'){if(url)window.open(url,'_blank','noopener,noreferrer');logEvent('open',{id,via:'v53-menu'}).catch(()=>{});closeMenu();return}
-  if(a==='copy'){try{await navigator.clipboard.writeText(url||(await getOne('links',id))?.url||'');toast('URL copied')}catch{toast('Copy failed')}closeMenu();return}
-  if(a==='edit'){closeMenu();requestAnimationFrame(()=>$('.v53-legacy-hook[data-action="edit"]',card)?.click());return}
-  if(a==='refresh'){closeMenu();refreshMetadata(id);return}
-  if(a==='move'){moveMenu(button,id);return}
-  if(a==='archive'){const link=await getOne('links',id);if(link){await putOne('archives',{id:uid('arc'),linkId:id,title:link.title,url:link.url,description:link.description||link.summary||'',imageUrl:link.imageUrl||link.heroImageUrl||link.featureImageUrl||'',capturedAt:Date.now(),source:'v53-manual'});logEvent('archive',{id,via:'v53'}).catch(()=>{});toast('Archived snapshot')}closeMenu();return}
-  if(a==='delete'){
-    if(button.dataset.armed!=='1'){button.dataset.armed='1';button.innerHTML='<i class="ph ph-warning-circle"></i><span>Click again to delete</span>';return}
-    const link=await getOne('links',id);if(!link)return;await deleteOne('links',id);logEvent('delete',{id,via:'v53'}).catch(()=>{});closeMenu();card?.remove();sideDelta('#side-links',-1);if(link.favorite)sideDelta('#side-favs',-1);
-    toast('Link deleted',async()=>{await putOne('links',link);insertVisibleCard(link);sideDelta('#side-links',1);if(link.favorite)sideDelta('#side-favs',1);logEvent('undo_delete',{id,via:'v53'}).catch(()=>{})});
-  }
-}
+async function refreshMetadata(id){const link=await getOne('links',id);if(!link)return;toast('Refreshing metadata…');try{const m=await getMetadata(link.url,await cfg()),now=Date.now();const next={...link,title:m?.title||link.title,domain:m?.domain||link.domain,description:m?.description||link.description||'',summary:m?.summary||m?.description||link.summary||'',imageUrl:m?.imageUrl||link.imageUrl||'',screenshotUrl:m?.screenshotUrl||link.screenshotUrl||'',heroImageUrl:m?.heroImageUrl||link.heroImageUrl||'',featureImageUrl:m?.featureImageUrl||link.featureImageUrl||'',featureLogoUrl:m?.featureLogoUrl||m?.featureImageUrl||link.featureLogoUrl||'',favicon:m?.favicon||link.favicon||'',logoUrl:m?.logoUrl||link.logoUrl||'',touchIconUrl:m?.touchIconUrl||link.touchIconUrl||'',manifestIconUrl:m?.manifestIconUrl||link.manifestIconUrl||'',themeColor:m?.themeColor||link.themeColor||'',brandKind:m?.brandKind||link.brandKind||'',brandAssetUrl:m?.brandAssetUrl||link.brandAssetUrl||'',category:m?.category||link.category||'General',tags:m?.tags||link.tags||[],pending:false,metadataRefreshedAt:now,updatedAt:now};await putOne('links',next);await refreshVisibleCard(id);logEvent('metadata_refresh',{id,source:m?.source||'manual',via:'v53'}).catch(()=>{});toast('Metadata updated')}catch(err){console.warn(err);toast('Refresh failed')}}
+async function moveMenu(anchor,id){closeMenu();const p=document.createElement('div');p.className='v51-action-menu v51-collection-menu v53-menu';p.dataset.linkId=id;p.innerHTML='<div class="v51-menu-head"><b>Move to collection</b><small>Loading…</small></div>';document.body.append(p);menu=p;place(anchor,p);requestAnimationFrame(()=>p.classList.add('open'));const [link,cols]=await Promise.all([getOne('links',id),getAll('collections')]);if(!link||menu!==p)return;p.innerHTML=`<div class="v51-menu-head"><b>Move to collection</b><small>${esc(link.title||link.domain||'Link')}</small></div>`+cols.map(c=>`<button data-v53-collection="${esc(c.id)}" class="${c.id===link.collectionId?'selected':''}"><i class="ph ph-${esc(c.icon||'folder')}"></i><span>${esc(c.name)}</span>${c.id===link.collectionId?'<i class="ph-fill ph-check-circle"></i>':''}</button>`).join('')}
+async function chooseCollection(button){const p=button.closest('.v53-menu'),id=p?.dataset.linkId,link=id?await getOne('links',id):null;if(!link)return;link.collectionId=button.dataset.v53Collection;link.updatedAt=Date.now();await putOne('links',link);await refreshVisibleCard(id);logEvent('move_collection',{id,collectionId:link.collectionId,via:'v53'}).catch(()=>{});closeMenu();toast('Moved to collection')}
+async function action(button){const p=button.closest('.v53-menu'),id=p?.dataset.linkId;if(!id)return;const card=$(`.link-card[data-link-id="${CSS.escape(id)}"]`),url=card?.dataset.linkUrl||'';const a=button.dataset.v53Menu;if(a==='open'){if(url)window.open(url,'_blank','noopener,noreferrer');logEvent('open',{id,via:'v53-menu'}).catch(()=>{});closeMenu();return}if(a==='copy'){try{await navigator.clipboard.writeText(url||(await getOne('links',id))?.url||'');toast('URL copied')}catch{toast('Copy failed')}closeMenu();return}if(a==='edit'){closeMenu();requestAnimationFrame(()=>$('.v53-legacy-hook[data-action="edit"]',card)?.click());return}if(a==='refresh'){closeMenu();refreshMetadata(id);return}if(a==='move'){moveMenu(button,id);return}if(a==='archive'){const link=await getOne('links',id);if(link){await putOne('archives',{id:uid('arc'),linkId:id,title:link.title,url:link.url,description:link.description||link.summary||'',imageUrl:link.imageUrl||link.heroImageUrl||link.featureImageUrl||'',capturedAt:Date.now(),source:'v53-manual'});logEvent('archive',{id,via:'v53'}).catch(()=>{});toast('Archived snapshot')}closeMenu();return}if(a==='delete'){if(button.dataset.armed!=='1'){button.dataset.armed='1';button.innerHTML='<i class="ph ph-warning-circle"></i><span>Click again to delete</span>';return}const link=await getOne('links',id);if(!link)return;await deleteOne('links',id);logEvent('delete',{id,via:'v53'}).catch(()=>{});closeMenu();card?.remove();sideDelta('#side-links',-1);if(link.favorite)sideDelta('#side-favs',-1);toast('Link deleted',async()=>{await putOne('links',link);insertVisibleCard(link);sideDelta('#side-links',1);if(link.favorite)sideDelta('#side-favs',1);logEvent('undo_delete',{id,via:'v53'}).catch(()=>{})})}}
 function openCard(card){const url=card.dataset.linkUrl;if(!url)return;window.open(url,'_blank','noopener,noreferrer');logEvent('open',{id:card.dataset.linkId,via:'v53-card'}).catch(()=>{})}
 
 document.addEventListener('click',e=>{
@@ -80,7 +25,7 @@ document.addEventListener('click',e=>{
   const item=e.target.closest?.('[data-v53-menu]');if(item){e.preventDefault();e.stopImmediatePropagation();action(item);return}
   const control=e.target.closest?.('[data-v53]');if(control){const card=control.closest('.link-card');if(!card)return;e.preventDefault();e.stopImmediatePropagation();control.dataset.v53==='favorite'?favorite(card,control):openMenu(control,card);return}
   if(e.target.closest?.('.v53-legacy-hook'))return;
-  const card=e.target.closest?.('.link-card[data-link-id]');if(card&&!card.hasAttribute('draggable')){e.preventDefault();e.stopImmediatePropagation();openCard(card);return}
+  const card=e.target.closest?.('.link-card[data-link-id]');if(card){e.preventDefault();e.stopImmediatePropagation();openCard(card);return}
   if(menu&&!e.target.closest?.('.v53-menu'))closeMenu();
 },true);
 
