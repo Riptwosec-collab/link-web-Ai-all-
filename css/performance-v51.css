@@ -7,7 +7,8 @@
 .link-card img{image-rendering:auto}
 #dynamic-content .grid{align-content:start}
 .v53-legacy-hook{display:none!important}
-.v53-card-exit{opacity:0!important;transform:translateY(2px)!important;transition:opacity .1s ease,transform .1s ease!important}
+.v53-star.active{color:#ffd166!important;background:rgba(120,83,10,.24)!important;border-color:rgba(251,191,36,.18)!important}
+.v53-more i{font-size:17px}.v53-card-exit{opacity:0!important;transform:translateY(2px)!important;transition:opacity .1s ease,transform .1s ease!important}
 button:active,.primary-btn:active,.secondary-btn:active,.icon-btn:active,.card-action:active{opacity:.78!important;transform:none!important}
 @media(max-width:767px){.link-card{contain-intrinsic-size:300px 270px}.holo-card,.glass-panel{box-shadow:0 8px 20px rgba(0,0,0,.13)!important}}
 @media(prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
