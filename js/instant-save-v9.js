@@ -6,7 +6,7 @@ const CARD_DATA_VERSION=12;
 const inflight=new Set();
 let knownUrls=null;
 let knownPromise=null;
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 function toast(text){
   const root=document.getElementById('toast-root');if(!root)return;
