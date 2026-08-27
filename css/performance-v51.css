@@ -1,10 +1,13 @@
-/* Smart Link Hub V5.1 — lean performance layer. Legacy V3/V5 logo-cover rules retired. */
-#dynamic-content{overscroll-behavior:contain;scroll-behavior:auto;overflow-anchor:none}
-.holo-card,.glass-panel{backdrop-filter:blur(9px)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 12px 34px rgba(0,0,0,.14)!important}
+/* Smart Link Hub V5.3 — lean rendering layer. */
+#dynamic-content{overscroll-behavior:contain;scroll-behavior:auto;overflow-anchor:none;contain:layout style paint}
+.holo-card,.glass-panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 10px 26px rgba(0,0,0,.14)!important}
 .holo-card{contain:layout style}
-.link-card{contain:layout paint style;content-visibility:auto;contain-intrinsic-size:320px 290px;will-change:auto!important;transform:translateZ(0);backface-visibility:hidden}
-.card-action,.preview-loader,.saving-pill,.ready-pill{backdrop-filter:none!important}
+.link-card{contain:layout paint style;content-visibility:auto;contain-intrinsic-size:320px 290px;will-change:auto!important;transform:none;backface-visibility:visible}
+.card-action,.preview-loader,.saving-pill,.ready-pill,.v51-action-menu{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .link-card img{image-rendering:auto}
 #dynamic-content .grid{align-content:start}
-@media(max-width:767px){.holo-card,.glass-panel{backdrop-filter:blur(6px)!important}.link-card{contain-intrinsic-size:300px 270px}}
+.v53-legacy-hook{display:none!important}
+.v53-card-exit{opacity:0!important;transform:translateY(2px)!important;transition:opacity .1s ease,transform .1s ease!important}
+button:active,.primary-btn:active,.secondary-btn:active,.icon-btn:active,.card-action:active{opacity:.78!important;transform:none!important}
+@media(max-width:767px){.link-card{contain-intrinsic-size:300px 270px}.holo-card,.glass-panel{box-shadow:0 8px 20px rgba(0,0,0,.13)!important}}
 @media(prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
