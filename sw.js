@@ -1,4 +1,4 @@
-const CACHE='slh-v5.3.0-lean-interaction-save';
+const CACHE='slh-v5.3.1-media-restore';
 const CORE=[
   './','./index.html','./css/app.css','./css/performance-v51.css','./css/card-v12.css','./css/nav-v5.css','./css/premium-v51.css','./css/smooth-v52.css',
   './js/app.js','./js/nav-v5.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v12.js','./js/smooth-v52.js','./js/interaction-v53.js','./js/analytics-v53.js','./js/shortcuts-v51.js','./js/cloud.js',
