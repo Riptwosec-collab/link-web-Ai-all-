@@ -30,14 +30,17 @@ export async function logEvent(type,detail={}){return putOne('events',{id:uid('e
 export async function getSetting(key,fallback=null){const row=await getOne('settings',key);return row?row.value:fallback}
 export async function setSetting(key,value){return putOne('settings',{key,value,updatedAt:Date.now()})}
 export async function exportAll(){return {version:4,exportedAt:new Date().toISOString(),links:await getAll('links'),collections:await getAll('collections'),settings:await getAll('settings'),events:await getAll('events'),archives:await getAll('archives'),workspaces:await getAll('workspaces')}}
-export async function exportCloudState(){return {version:1,syncedAt:new Date().toISOString(),links:await getAll('links'),collections:await getAll('collections'),settings:await getAll('settings'),archives:await getAll('archives'),workspaces:await getAll('workspaces')}}
-export async function importCloudState(state={}){
+export async function exportCloudState(){return {version:2,syncedAt:new Date().toISOString(),links:await getAll('links'),collections:await getAll('collections'),settings:await getAll('settings'),archives:await getAll('archives'),workspaces:await getAll('workspaces')}}
+export async function importCloudState(state={},options={}){
+  const replace=options?.replace===true;
   globalThis.__slhCloudApplying=true;
   try{
     for(const n of ['links','collections','settings','archives','workspaces']){
       const rows=Array.isArray(state[n])?state[n]:[];
-      const s=await store(n,'readwrite');
-      await new Promise((res,rej)=>{const r=s.clear();r.onsuccess=()=>res();r.onerror=()=>rej(r.error)});
+      if(replace){
+        const s=await store(n,'readwrite');
+        await new Promise((res,rej)=>{const r=s.clear();r.onsuccess=()=>res();r.onerror=()=>rej(r.error)});
+      }
       if(rows.length)await bulkPut(n,rows);
     }
   }finally{globalThis.__slhCloudApplying=false}
