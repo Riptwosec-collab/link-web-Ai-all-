@@ -27,6 +27,8 @@ jobs:
           node --check js/v6-bridge.js
           node --check js/v6-import.js
           node --check js/v6-bulk-extra.js
+          node --check js/theme-v61.js
+          node --check sw.js
           node --check worker/src/index.js
           node --check extension/popup.js
       - name: JSON manifests
@@ -39,6 +41,7 @@ jobs:
           const need=(f)=>{if(!fs.existsSync(f))throw new Error('Missing '+f)};
           const files=[
             'css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js','js/v6-import.js','js/v6-bulk-extra.js',
+            'css/theme-v61.css','css/theme-v61-legacy.css','css/theme-v61-runtime.css','js/theme-v61.js',
             'extension/manifest.json','extension/popup.html','extension/popup.js','worker/src/index.js',
             'supabase/migrations/20260908000028_smartlink_cloud_state_history_v2.sql',
             'supabase/migrations/20260908000100_smartlink_v6_cloud_safety_and_devices.sql',
@@ -48,7 +51,35 @@ jobs:
           files.forEach(need);
 
           const index=fs.readFileSync('index.html','utf8');
-          for(const s of ['css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js'])if(!index.includes(s))throw new Error('index missing '+s);
+          for(const s of [
+            'css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js',
+            'css/theme-v61.css','css/theme-v61-legacy.css','css/theme-v61-runtime.css','js/theme-v61.js'
+          ])if(!index.includes(s))throw new Error('index missing '+s);
+          if(index.indexOf('css/theme-v61.css')<index.indexOf('css/v6-platform.css'))throw new Error('theme CSS must load after V6 CSS');
+          if(index.indexOf('css/theme-v61-runtime.css')<index.indexOf('css/theme-v61.css'))throw new Error('runtime theme bridge must load last');
+          if(!index.includes("document.documentElement.dataset.theme"))throw new Error('first-paint theme bootstrap missing');
+
+          const themeCss=fs.readFileSync('css/theme-v61.css','utf8');
+          for(const s of [
+            'body[data-theme="gold"]','body[data-theme="blue"]',
+            '--bg: #020304','--panel: rgba(7, 10, 15, 0.92)',
+            '--accent: #f5c542','--accent2: #ffe28a','--accent-dark: #c88900',
+            '--accent-rgb: 245, 197, 66','--glow: rgba(245, 197, 66, 0.35)',
+            '--accent: #38bdf8','--accent2: #8be8ff',
+            '.slh-theme-trigger','.slh-theme-option'
+          ])if(!themeCss.includes(s))throw new Error('theme contract missing '+s);
+
+          const legacyTheme=fs.readFileSync('css/theme-v61-legacy.css','utf8');
+          for(const s of ['--v51-cyan: var(--accent)','--n54-cyan: var(--accent)','#v51-visual-layer','.v51-action-menu','.v51-metric-card','.v12-title-copy p'])if(!legacyTheme.includes(s))throw new Error('legacy theme bridge missing '+s);
+
+          const runtimeTheme=fs.readFileSync('css/theme-v61-runtime.css','utf8');
+          for(const s of ['#smartlink-auth-gate','#smartlink-user-wrap','.slh-submit','#slh-theme-settings'])if(!runtimeTheme.includes(s))throw new Error('runtime theme bridge missing '+s);
+
+          const themeJs=fs.readFileSync('js/theme-v61.js','utf8');
+          for(const s of ['Obsidian Gold','Midnight Blue','slh_theme_v61','setSetting','getSetting','injectHeaderSwitcher','injectLoginSwitcher','injectSettingsCard','SmartLinkTheme','requestAnimationFrame'])if(!themeJs.includes(s))throw new Error('theme controller missing '+s);
+
+          const sw=fs.readFileSync('sw.js','utf8');
+          for(const s of ['slh-v6.1-dual-theme','./css/theme-v61.css','./css/theme-v61-legacy.css','./css/theme-v61-runtime.css','./js/theme-v61.js'])if(!sw.includes(s))throw new Error('service worker theme cache missing '+s);
 
           const db=fs.readFileSync('js/db.js','utf8');
           for(const s of ["'trash'","'tombstones'","'syncQueue'",'restoreTrash','getSyncQueueCount'])if(!db.includes(s))throw new Error('db contract missing '+s);
@@ -61,6 +92,7 @@ jobs:
 
           const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
           if(!manifest.share_target||!manifest.shortcuts?.length)throw new Error('PWA share target/shortcuts missing');
+          if(manifest.theme_color!=='#020304'||manifest.background_color!=='#020304')throw new Error('PWA default theme color must match Obsidian Gold');
 
           const migrationText=files.filter(f=>f.endsWith('.sql')).map(f=>fs.readFileSync(f,'utf8')).join('\n');
           for(const s of [
@@ -71,7 +103,7 @@ jobs:
           if(!/security definer/i.test(migrationText)||!/set search_path to ''/i.test(migrationText))throw new Error('SECURITY DEFINER hardening missing');
           if(!/revoke all on table public\.smartlink_cloud_state from anon, authenticated/i.test(migrationText))throw new Error('direct Data API deny contract missing');
 
-          console.log('V6 contracts OK');
+          console.log('V6 + dual-theme contracts OK');
           NODE
       - name: Secret hygiene guard
         run: |
