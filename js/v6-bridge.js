@@ -4,6 +4,17 @@
   if(!('Notification' in window))window.Notification={permission:'unsupported',requestPermission:async()=> 'denied'};
   Promise.allSettled([import('./v6-import.js?v=6'),import('./v6-bulk-extra.js?v=6')]);
 
+  async function openPage(page){
+    const allowed=new Set(['read-later','ai','trash','cloud']);
+    if(!allowed.has(page))return false;
+    for(let i=0;i<60;i++){
+      const btn=document.querySelector(`#v6-nav-marker [data-v6-page="${page}"]`);
+      if(btn){btn.click();return true}
+      await sleep(70)
+    }
+    return false
+  }
+
   async function openAddShortcut(){
     const p=new URLSearchParams(location.search);
     if(p.get('v6')!=='add')return;
@@ -41,6 +52,8 @@
     }catch{}
   }
 
+  window.SmartLinkV6={...(window.SmartLinkV6||{}),openPage};
+  window.dispatchEvent(new Event('smartlink:v6-bridge-ready'));
   window.addEventListener('smartlink:v6-lock',lockViaSettings);
   window.addEventListener('smartlink:local-mutation',()=>{if(!navigator.onLine){hadPending=true;registerBackgroundSync()}});
   window.addEventListener('smartlink:cloud-state',e=>{
