@@ -1,8 +1,8 @@
 {
   "id":"/",
-  "name":"Smart Link Hub V6",
+  "name":"Smart Link Hub V7",
   "short_name":"Link Hub",
-  "description":"Local-first AI web library with Auto Save, conflict-safe cloud sync, Trash, Read Later and versioned backup.",
+  "description":"Personal Web Memory with local-first Auto Save, semantic AI search, full-text archive, conflict-safe Cloud Sync, Trash and versioned backup.",
   "start_url":"/",
   "scope":"/",
   "display":"standalone",
@@ -18,8 +18,9 @@
   ],
   "shortcuts":[
     {"name":"Add Link","short_name":"Add","description":"Capture a new web link","url":"/?v6=add","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
+    {"name":"Semantic AI","short_name":"AI Search","description":"Search your saved library by meaning","url":"/?v7=semantic","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
     {"name":"Read Later","short_name":"Read Later","description":"Open your reading queue","url":"/?v6=read-later","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
-    {"name":"Ask My Links","short_name":"AI Search","description":"Search and ask questions across saved links","url":"/?v6=ai","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
+    {"name":"System Status","short_name":"Status","description":"Verify Cloud, Worker, PWA and build health","url":"/?v7=status","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
     {"name":"Cloud & Backup","short_name":"Backup","description":"Review sync and version history","url":"/?v6=cloud","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]}
   ],
   "share_target":{
