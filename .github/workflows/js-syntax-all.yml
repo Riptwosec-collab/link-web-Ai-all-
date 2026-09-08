@@ -1,0 +1,27 @@
+name: Smart Link Hub JavaScript Syntax Gate
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check every JavaScript source
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' f; do
+            echo "Checking $f"
+            node --check "$f"
+          done < <(find js worker/src extension tests -type f -name '*.js' -print0)
+          node --check sw.js
+          node --check playwright.config.js
