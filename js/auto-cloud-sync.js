@@ -54,6 +54,10 @@ function fingerprint(state={}){
   return JSON.stringify(canonical(data));
 }
 function counts(state={}){return {links:Array.isArray(state.links)?state.links.length:0,collections:Array.isArray(state.collections)?state.collections.length:0}}
+function refreshUi(detail={}){
+  window.dispatchEvent(new CustomEvent('smartlink:cloud-restored',{detail}));
+  try{window.dispatchEvent(new HashChangeEvent('hashchange'))}catch{window.dispatchEvent(new Event('hashchange'))}
+}
 async function rpc(name,body){
   const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{
     method:'POST',
@@ -102,6 +106,7 @@ async function pushNow(){
     local=mergeStates(local,cloud.state);
     restoring=true;
     try{await importCloudState(local)}finally{restoring=false}
+    refreshUi({revision:cloud.revision,...counts(local)});
   }
   return pushState(local);
 }
@@ -137,6 +142,7 @@ async function reconcile(){
     const merged=mergeStates(local,cloud.state||{});
     restoring=true;
     try{await importCloudState(merged)}finally{restoring=false}
+    refreshUi({revision:cloud.revision,...counts(merged)});
 
     const cloudNeedsMerge=fingerprint(merged)!==fingerprint(cloud.state||{});
     if(dirty||cloudNeedsMerge||requested){
@@ -146,7 +152,6 @@ async function reconcile(){
     clearDirty(cloud.revision);
     const c=counts(merged);
     setStatus('synced',`Synced · ${c.links} links`);
-    window.dispatchEvent(new CustomEvent('smartlink:cloud-restored',{detail:{revision:cloud.revision,...c}}));
   }catch(err){console.warn('Cloud reconcile',err);markDirty();setStatus(navigator.onLine?'error':'offline')}
 }
 async function bootstrap(){if(!(await waitForSession())){setStatus('local');return}await reconcile()}
