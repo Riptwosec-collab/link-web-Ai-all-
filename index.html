@@ -3,16 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#060b13" />
+  <meta name="theme-color" content="#020304" />
   <meta name="description" content="Smart Link Hub V6 — resilient local-first AI web library with automatic cloud backup" />
   <meta name="application-name" content="Smart Link Hub" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="manifest.webmanifest?v=6" />
+  <link rel="manifest" href="manifest.webmanifest?v=6.1" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon.svg" />
   <title>Smart Link Hub V6</title>
+  <script>
+    // Apply the saved theme before first paint to prevent a blue/gold flash.
+    (()=>{try{const t=localStorage.getItem('slh_theme_v61')||localStorage.getItem('smartlink_theme')||'gold';document.documentElement.dataset.theme=t==='blue'?'blue':'gold'}catch(_){document.documentElement.dataset.theme='gold'}})();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -21,7 +25,7 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{dark:'#060b13',panel:'#0b1420',accent:'#3b82f6',cyan:'#22d3ee',violet:'#8b5cf6'}}}}}
+    tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{dark:'#020304',panel:'#0a0e14',accent:'#f5c542',cyan:'#ffe28a',violet:'#c88900'}}}}}
   </script>
   <link rel="stylesheet" href="css/app.css?v=6" />
   <link rel="stylesheet" href="css/performance-v51.css?v=6" />
@@ -31,6 +35,7 @@
   <link rel="stylesheet" href="css/smooth-v52.css?v=6" />
   <link rel="stylesheet" href="css/neo-v54.css?v=6" />
   <link rel="stylesheet" href="css/v6-platform.css?v=6" />
+  <link rel="stylesheet" href="css/theme-v61.css?v=6.1" />
 </head>
 <body class="h-[100dvh] overflow-hidden bg-brand-dark text-slate-200 antialiased">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div><div class="noise"></div>
@@ -104,5 +109,6 @@
   <script src="js/shortcuts-v51.js?v=6"></script>
   <script type="module" src="js/v6-platform.js?v=6"></script>
   <script src="js/v6-bridge.js?v=6"></script>
+  <script src="js/theme-v61.js?v=6.1"></script>
 </body>
 </html>
