@@ -1,0 +1,11 @@
+{
+  "manifest_version":3,
+  "name":"Smart Link Hub V6 Capture",
+  "version":"6.0.0",
+  "description":"Save the current Chrome or Edge tab to Smart Link Hub with Auto Save and Cloud Sync.",
+  "permissions":["activeTab","tabs"],
+  "action":{
+    "default_title":"Save to Smart Link Hub",
+    "default_popup":"popup.html"
+  }
+}
