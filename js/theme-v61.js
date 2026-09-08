@@ -29,9 +29,11 @@
     return valid(legacy) ? legacy : '';
   };
 
+  const initialLocalTheme = savedLocal();
+  const hadLocalChoice = Boolean(initialLocalTheme);
   let currentTheme = valid(document.documentElement.dataset.theme)
     ? document.documentElement.dataset.theme
-    : (savedLocal() || 'gold');
+    : (initialLocalTheme || 'gold');
   let dbLoaded = false;
   let observer = null;
 
@@ -93,7 +95,7 @@
     if (dbLoaded) return;
     dbLoaded = true;
     // A device-local choice wins immediately. Cloud is used on a fresh device.
-    if (savedLocal()) return;
+    if (hadLocalChoice) return;
     try {
       const mod = await import('./db.js');
       if (typeof mod.getSetting !== 'function') return;
@@ -163,16 +165,16 @@
   }
 
   function settingsMarkup() {
-    return `<section id="slh-theme-settings" class="v6-panel slh-theme-settings">
-      <div class="slh-theme-settings-head">
+    return `<section id="slh-theme-settings" class="v6-panel slh-theme-settings p-5">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div>
           <div class="v6-kicker">Appearance</div>
-          <h3>Interface Theme</h3>
-          <p>ใช้ชุดสีเดียวกันทั้ง Sidebar, Cards, AI, Cloud, Modal, Inputs และ Command Palette</p>
+          <h3 class="text-base font-semibold text-white">Interface Theme</h3>
+          <p class="text-[10px] leading-5 mt-1" style="color:var(--muted)">ใช้ชุดสีเดียวกันทั้ง Sidebar, Cards, AI, Cloud, Modal, Inputs และ Command Palette</p>
         </div>
         <span class="v6-chip cyan" data-slh-current-theme>${THEMES[currentTheme].name}</span>
       </div>
-      <div class="slh-theme-settings-grid">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
         ${optionMarkup('gold')}
         ${optionMarkup('blue')}
       </div>
