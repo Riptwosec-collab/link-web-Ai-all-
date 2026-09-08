@@ -1,11 +1,13 @@
 import {initCore,BUILD} from './core.js';
 import {initKnowledge} from './knowledge.js';
 import {initMobile} from './mobile.js';
+import {initAutoCategory} from './auto-category.js';
 
 async function boot(){
   try{
     await initCore();
     await initKnowledge();
+    initAutoCategory();
     initMobile();
     document.documentElement.classList.add('slh-v7-ready');
     window.dispatchEvent(new CustomEvent('smartlink:v7-ready',{detail:{build:BUILD}}));
