@@ -2,6 +2,7 @@
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   let hadPending=false;
   if(!('Notification' in window))window.Notification={permission:'unsupported',requestPermission:async()=> 'denied'};
+  Promise.allSettled([import('./v6-import.js?v=6'),import('./v6-bulk-extra.js?v=6')]);
 
   async function openAddShortcut(){
     const p=new URLSearchParams(location.search);
