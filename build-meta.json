@@ -1,0 +1,9 @@
+{
+  "name":"Smart Link Hub",
+  "version":"7.0.0",
+  "buildId":"slh-v7-20260909",
+  "schema":7,
+  "channel":"main",
+  "features":["local-first","conflict-safe-cloud","trash","semantic-search","pgvector","full-text-archive","smart-views","duplicate-center","ai-librarian","system-status","dual-theme","pwa","extension-v2"],
+  "generatedAt":"2026-09-09T00:00:00+07:00"
+}
