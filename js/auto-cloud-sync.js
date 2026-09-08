@@ -71,11 +71,11 @@ async function rpc(name,body){
 function setStatus(mode,detail=''){
   lastStatus=mode;
   const pill=document.getElementById('sync-pill');if(!pill)return;
-  const map={syncing:['syncing','Syncing…'],synced:['cloud',detail||'Synced'],offline:['local','Offline'],error:['local','Sync retry'],local:['local','Auto Cloud']};
+  const map={syncing:['syncing','Saving…'],synced:['cloud',detail||'Saved to Cloud'],offline:['local','Saved locally'],error:['local','Cloud retry'],local:['local','Auto Save']};
   const [cls,label]=map[mode]||map.local;
   pill.className=`status-pill ${cls}`;
   pill.innerHTML=`<span></span>${label}`;
-  pill.title=mode==='synced'?'Auto Cloud Sync is active':mode==='offline'?'Offline: local changes will sync automatically when online':'Auto Cloud Sync';
+  pill.title=mode==='synced'?'Auto Save + Supabase Cloud Sync is active':mode==='offline'?'Saved locally. Cloud sync will resume automatically when online.':'Auto Save';
 }
 function markDirty(){try{localStorage.setItem(DIRTY_KEY,'1')}catch{}}
 function clearDirty(nextRevision){
@@ -93,7 +93,7 @@ async function pushState(state){
   const row=Array.isArray(rows)?rows[0]:rows;
   clearDirty(row?.revision);
   const c=counts(state);
-  setStatus('synced',`Synced · ${c.links} links`);
+  setStatus('synced',`Cloud saved · ${c.links} links`);
   window.dispatchEvent(new CustomEvent('smartlink:cloud-synced',{detail:{revision:row?.revision||null,updatedAt:row?.updated_at||null,...c}}));
   return true;
 }
@@ -120,14 +120,15 @@ async function drain(){
     }while(requested)
   }finally{
     syncing=false;
-    if(requested&&!debounceTimer){debounceTimer=setTimeout(()=>{debounceTimer=null;drain()},250)}
+    if(requested&&!debounceTimer){debounceTimer=setTimeout(()=>{debounceTimer=null;drain()},180)}
   }
 }
 function queueSync(){
   markDirty();requested=true;
+  setStatus(navigator.onLine?'syncing':'offline');
   if(restoring||syncing)return;
   clearTimeout(debounceTimer);
-  debounceTimer=setTimeout(()=>{debounceTimer=null;drain()},180);
+  debounceTimer=setTimeout(()=>{debounceTimer=null;drain()},100);
 }
 async function waitForSession(){for(let i=0;i<80;i++){if(token())return true;await sleep(250)}return false}
 async function reconcile(){
@@ -151,12 +152,19 @@ async function reconcile(){
 
     clearDirty(cloud.revision);
     const c=counts(merged);
-    setStatus('synced',`Synced · ${c.links} links`);
+    setStatus('synced',`Cloud saved · ${c.links} links`);
   }catch(err){console.warn('Cloud reconcile',err);markDirty();setStatus(navigator.onLine?'error':'offline')}
+}
+async function sessionReady(){
+  if(!token()){setStatus('local');return}
+  requested=true;
+  await reconcile();
 }
 async function bootstrap(){if(!(await waitForSession())){setStatus('local');return}await reconcile()}
 
 window.addEventListener('smartlink:local-mutation',queueSync);
+window.addEventListener('smartlink:session-ready',()=>sessionReady());
+window.addEventListener('smartlink:session-cleared',()=>{requested=false;setStatus('local')});
 window.addEventListener('online',()=>{requested=true;reconcile()},{passive:true});
 window.addEventListener('offline',()=>setStatus('offline'),{passive:true});
 window.addEventListener('hashchange',()=>setTimeout(()=>setStatus(lastStatus),0));
