@@ -1,8 +1,9 @@
-const CACHE='slh-v6.1-dual-theme';
+const CACHE='slh-v7-knowledge-memory';
 const CORE=[
-  './','./index.html',
-  './css/app.css','./css/performance-v51.css','./css/card-v12.css','./css/nav-v5.css','./css/premium-v51.css','./css/smooth-v52.css','./css/neo-v54.css','./css/v6-platform.css','./css/theme-v61.css','./css/theme-v61-legacy.css','./css/theme-v61-runtime.css',
-  './js/app.js','./js/nav-v5.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v12.js','./js/auto-cloud-sync.js','./js/auto-cloud-ui.js','./js/smooth-v52.js','./js/interaction-v53.js','./js/analytics-v53.js','./js/neo-v54.js','./js/shortcuts-v51.js','./js/cloud.js','./js/v6-platform.js','./js/theme-v61.js',
+  './','./index.html','./share.html','./build-meta.json',
+  './css/app.css','./css/performance-v51.css','./css/card-v12.css','./css/nav-v5.css','./css/premium-v51.css','./css/smooth-v52.css','./css/neo-v54.css','./css/v6-platform.css','./css/theme-v61.css','./css/theme-v61-legacy.css','./css/theme-v61-runtime.css','./css/v7.css',
+  './js/e2e-boot.js','./js/app.js','./js/nav-v5.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v12.js','./js/auto-cloud-sync.js','./js/auto-cloud-ui.js','./js/smooth-v52.js','./js/interaction-v53.js','./js/analytics-v53.js','./js/neo-v54.js','./js/shortcuts-v51.js','./js/cloud.js','./js/v6-platform.js','./js/v6-bridge.js','./js/theme-v61.js',
+  './js/v7/boot.js','./js/v7/core.js','./js/v7/knowledge.js','./js/v7/mobile.js','./js/v7/search-worker.js',
   './manifest.webmanifest','./icons/icon.svg'
 ];
 
@@ -14,11 +15,12 @@ self.addEventListener('fetch',event=>{
   const url=new URL(event.request.url);
   if(event.request.mode==='navigate'){
     event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
-      if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put('./index.html',copy))}
+      if(response.ok&&url.origin===location.origin){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy))}
       return response;
-    }).catch(()=>caches.match('./index.html')));return;
+    }).catch(async()=>await caches.match(event.request)||await caches.match('./index.html')));return;
   }
-  if(url.origin===location.origin&&(url.pathname.endsWith('.js')||url.pathname.endsWith('.css')||url.pathname.endsWith('.webmanifest'))){
+  const versioned=url.origin===location.origin&&(url.pathname.endsWith('.js')||url.pathname.endsWith('.css')||url.pathname.endsWith('.webmanifest')||url.pathname.endsWith('/build-meta.json'));
+  if(versioned){
     event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
       if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy))}
       return response;
@@ -34,14 +36,19 @@ self.addEventListener('sync',event=>{
   if(event.tag==='smartlink-cloud-sync')event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(clients=>{for(const client of clients)client.postMessage({type:'smartlink-cloud-sync'});}));
 });
 
+self.addEventListener('periodicsync',event=>{
+  if(event.tag==='smartlink-maintenance')event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(clients=>{for(const client of clients)client.postMessage({type:'smartlink-maintenance'});}));
+});
+
 self.addEventListener('message',event=>{
   if(event.data?.type==='SKIP_WAITING')self.skipWaiting();
   if(event.data?.type==='SMARTLINK_SYNC')event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(clients=>{for(const client of clients)client.postMessage({type:'smartlink-cloud-sync'});}));
+  if(event.data?.type==='SMARTLINK_MAINTENANCE')event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(clients=>{for(const client of clients)client.postMessage({type:'smartlink-maintenance'});}));
 });
 
 self.addEventListener('notificationclick',event=>{
   event.notification.close();
-  const target=event.notification.data?.url||'/?v6=cloud';
+  const target=event.notification.data?.url||'/?v7=status';
   event.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(async clients=>{
     for(const client of clients){if('focus'in client){await client.focus();client.navigate?.(target);return}}
     if(self.clients.openWindow)return self.clients.openWindow(target);
