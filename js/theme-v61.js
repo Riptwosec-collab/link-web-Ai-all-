@@ -9,15 +9,13 @@
       name: 'Obsidian Gold',
       short: 'Gold',
       description: 'Black glass · premium gold',
-      themeColor: '#020304',
-      icon: 'ph-sparkle'
+      themeColor: '#020304'
     },
     blue: {
       name: 'Midnight Blue',
       short: 'Blue',
       description: 'Deep black · electric cyan',
-      themeColor: '#02050a',
-      icon: 'ph-drop'
+      themeColor: '#02050a'
     }
   };
 
@@ -36,6 +34,7 @@
     : (initialLocalTheme || 'gold');
   let dbLoaded = false;
   let observer = null;
+  let uiScheduled = false;
 
   function updateMeta(theme) {
     let meta = document.querySelector('meta[name="theme-color"]');
@@ -125,32 +124,14 @@
     </button>`;
   }
 
-  function injectHeaderSwitcher() {
-    if (document.getElementById('slh-theme-wrap')) return;
-    const addButton = document.getElementById('add-link-btn');
-    const host = addButton?.parentElement;
-    if (!host) return;
-
-    const wrap = document.createElement('div');
-    wrap.id = 'slh-theme-wrap';
-    wrap.className = 'slh-theme-wrap';
-    wrap.innerHTML = `<button id="slh-theme-trigger" type="button" class="slh-theme-trigger" aria-haspopup="menu" aria-expanded="false" title="Switch theme (Alt+T)">
-        <span class="slh-theme-orb" aria-hidden="true"></span>
-        <span class="slh-theme-name" data-slh-theme-label>${THEMES[currentTheme].short}</span>
-        <i class="ph ph-caret-down" aria-hidden="true"></i>
-      </button>
-      <div id="slh-theme-menu" class="slh-theme-menu" role="menu" hidden>
-        <div class="slh-theme-menu-title">Interface theme</div>
-        ${optionMarkup('gold')}
-        ${optionMarkup('blue')}
-      </div>`;
-    host.insertBefore(wrap, addButton);
-
-    const trigger = wrap.querySelector('#slh-theme-trigger');
-    const menu = wrap.querySelector('#slh-theme-menu');
+  function bindThemeMenu(wrap) {
+    const trigger = wrap.querySelector('.slh-theme-trigger');
+    const menu = wrap.querySelector('.slh-theme-menu');
+    if (!trigger || !menu) return;
     trigger.addEventListener('click', event => {
       event.stopPropagation();
       const open = menu.hidden;
+      document.querySelectorAll('.slh-theme-menu').forEach(other => { if (other !== menu) other.hidden = true; });
       menu.hidden = !open;
       trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
@@ -161,6 +142,46 @@
       menu.hidden = true;
       trigger.setAttribute('aria-expanded', 'false');
     });
+  }
+
+  function switcherMarkup(idPrefix = 'slh-theme') {
+    return `<button type="button" class="slh-theme-trigger" aria-haspopup="menu" aria-expanded="false" title="Switch theme (Alt+T)">
+        <span class="slh-theme-orb" aria-hidden="true"></span>
+        <span class="slh-theme-name" data-slh-theme-label>${THEMES[currentTheme].short}</span>
+        <i class="ph ph-caret-down" aria-hidden="true"></i>
+      </button>
+      <div class="slh-theme-menu" role="menu" hidden data-theme-menu="${idPrefix}">
+        <div class="slh-theme-menu-title">Interface theme</div>
+        ${optionMarkup('gold')}
+        ${optionMarkup('blue')}
+      </div>`;
+  }
+
+  function injectHeaderSwitcher() {
+    if (document.getElementById('slh-theme-wrap')) return;
+    const addButton = document.getElementById('add-link-btn');
+    const host = addButton?.parentElement;
+    if (!host) return;
+
+    const wrap = document.createElement('div');
+    wrap.id = 'slh-theme-wrap';
+    wrap.className = 'slh-theme-wrap';
+    wrap.innerHTML = switcherMarkup('header');
+    host.insertBefore(wrap, addButton);
+    bindThemeMenu(wrap);
+    updateControls();
+  }
+
+  function injectLoginSwitcher() {
+    const login = document.querySelector('#smartlink-auth-gate .slh-login');
+    if (!login || document.getElementById('slh-login-theme-wrap')) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'slh-login-theme-wrap';
+    wrap.className = 'slh-theme-wrap';
+    wrap.style.cssText = 'position:absolute;right:16px;top:16px;z-index:8';
+    wrap.innerHTML = switcherMarkup('login');
+    login.appendChild(wrap);
+    bindThemeMenu(wrap);
     updateControls();
   }
 
@@ -170,7 +191,7 @@
         <div>
           <div class="v6-kicker">Appearance</div>
           <h3 class="text-base font-semibold text-white">Interface Theme</h3>
-          <p class="text-[10px] leading-5 mt-1" style="color:var(--muted)">ใช้ชุดสีเดียวกันทั้ง Sidebar, Cards, AI, Cloud, Modal, Inputs และ Command Palette</p>
+          <p class="text-[10px] leading-5 mt-1" style="color:var(--muted)">ใช้ชุดสีเดียวกันทั้ง Sidebar, Cards, AI, Cloud, Modal, Inputs, Login และ Command Palette</p>
         </div>
         <span class="v6-chip cyan" data-slh-current-theme>${THEMES[currentTheme].name}</span>
       </div>
@@ -201,19 +222,17 @@
     updateControls();
   }
 
-  function closeMenu() {
-    const menu = document.getElementById('slh-theme-menu');
-    const trigger = document.getElementById('slh-theme-trigger');
-    if (menu) menu.hidden = true;
-    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  function closeMenus() {
+    document.querySelectorAll('.slh-theme-menu').forEach(menu => { menu.hidden = true; });
+    document.querySelectorAll('.slh-theme-trigger').forEach(trigger => trigger.setAttribute('aria-expanded', 'false'));
   }
 
   function bindGlobalEvents() {
     document.addEventListener('click', event => {
-      if (!event.target.closest('#slh-theme-wrap')) closeMenu();
+      if (!event.target.closest('.slh-theme-wrap')) closeMenus();
     });
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') closeMenu();
+      if (event.key === 'Escape') closeMenus();
       if (event.altKey && event.key.toLowerCase() === 't') {
         event.preventDefault();
         const next = currentTheme === 'gold' ? 'blue' : 'gold';
@@ -222,25 +241,36 @@
     });
   }
 
+  function refreshInjectedUi() {
+    injectHeaderSwitcher();
+    injectLoginSwitcher();
+    injectSettingsCard();
+  }
+
+  function scheduleInjectedUi() {
+    if (uiScheduled) return;
+    uiScheduled = true;
+    requestAnimationFrame(() => {
+      uiScheduled = false;
+      refreshInjectedUi();
+    });
+  }
+
   function watchDynamicUi() {
     if (observer) return;
-    observer = new MutationObserver(() => {
-      injectHeaderSwitcher();
-      injectSettingsCard();
-    });
+    observer = new MutationObserver(scheduleInjectedUi);
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
   function boot() {
     applyTheme(currentTheme, { persist: false });
-    injectHeaderSwitcher();
-    injectSettingsCard();
+    refreshInjectedUi();
     bindGlobalEvents();
     watchDynamicUi();
     hydrateFromDatabase();
   }
 
-  // Public bridge for other V6 modules and future command-palette actions.
+  // Public bridge for V6 modules and future command-palette actions.
   window.SmartLinkTheme = {
     get: () => currentTheme,
     set: theme => applyTheme(theme, { persist: true, announce: true }),
