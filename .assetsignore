@@ -1,0 +1,27 @@
+# Cloudflare Workers Static Assets ignore rules
+# Keep build/runtime dependencies and development-only files out of the asset upload.
+node_modules
+**/node_modules
+.git
+.github
+.wrangler
+.dev.vars*
+
+# Tests and local tooling
+tests
+test-results
+playwright-report
+playwright.config.js
+package.json
+package-lock.json
+npm-debug.log*
+
+# Backend / infrastructure source should never be published as static assets
+worker
+supabase
+
+# Repository-only files
+README.md
+wrangler.toml
+.assetsignore
+extension
