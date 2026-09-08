@@ -18,6 +18,17 @@ test('V7 boots through the custom cloud session and exposes build truth',async({
   await expect(page.locator('body')).toContainText('Smart Link Hub');
 });
 
+test('Desktop sidebar exposes only the seven daily navigation destinations',async({page})=>{
+  await openApp(page);
+  await page.locator('#sidebar-nav.slh-clean-nav').waitFor();
+  const labels=await page.locator('#sidebar-nav>[data-slh-primary].nav-item').allTextContents();
+  expect(labels.map(x=>x.replace(/\s+/g,' ').trim())).toEqual(['Home','Library','AI Search','Categories','Favorites','Read Later','Settings']);
+  await expect(page.locator('#sidebar-nav>[data-page="analytics"]')).toBeHidden();
+  await expect(page.locator('#sidebar-nav>[data-page="workspaces"]')).toBeHidden();
+  await expect(page.locator('#v7-nav')).toBeHidden();
+  await expect(page.locator('#v6-nav-marker')).toBeHidden();
+});
+
 test('Gold and Blue themes persist across reload',async({page})=>{
   await openApp(page);
   expect(await page.evaluate(()=>document.documentElement.dataset.theme)).toBe('gold');
@@ -89,7 +100,7 @@ test('Semantic index, hybrid search and full-text archive work against determini
   expect(archived.archived).toBeGreaterThan(0);
 });
 
-test('Import analysis does not write before confirmation and Smart Views render live results',async({page})=>{
+test('Import analysis does not write before confirmation and Smart Views remain available as library tools',async({page})=>{
   await openApp(page);
   await page.evaluate(()=>window.SmartLinkV7.captureText('https://github.com/example/demo',{title:'Demo repository',via:'e2e'}));
   await page.evaluate(()=>window.dispatchEvent(new CustomEvent('smartlink:v7-open',{detail:{page:'views'}})));
@@ -100,12 +111,12 @@ test('Import analysis does not write before confirmation and Smart Views render 
   await expect(page.locator('#dynamic-content')).toContainText('Analyze');
 });
 
-test('@mobile mobile navigation exposes primary actions without desktop sidebar dependence',async({page})=>{
+test('@mobile mobile navigation keeps Home, Library, Add, AI and Categories',async({page})=>{
   await openApp(page);
   await expect(page.locator('#v7-mobile-nav')).toBeVisible();
   await page.locator('[data-v7-mobile="ai"]').click();
   await expect(page.locator('#page-title')).toHaveText('Semantic AI');
-  await page.locator('[data-v7-mobile="more"]').click();
-  await expect(page.locator('.v7-mobile-sheet')).toBeVisible();
-  await expect(page.locator('.v7-mobile-sheet')).toContainText('System Status');
+  await expect(page.locator('[data-v7-mobile="categories"]')).toBeVisible();
+  await page.locator('[data-v7-mobile="categories"]').click();
+  await expect(page.locator('#page-title')).toHaveText('Category Center');
 });
