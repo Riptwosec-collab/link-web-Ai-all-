@@ -2,14 +2,16 @@ import {initCore,BUILD} from './core.js';
 import {initKnowledge} from './knowledge.js';
 import {initMobile} from './mobile.js';
 import {initAutoCategory} from './auto-category.js';
+import {initOrganization} from './organization.js';
 
 async function boot(){
   try{
     await initCore();
     await initKnowledge();
     initAutoCategory();
+    initOrganization();
     initMobile();
-    document.documentElement.classList.add('slh-v7-ready');
+    document.documentElement.classList.add('slh-v7-ready','slh-v76-ready');
     window.dispatchEvent(new CustomEvent('smartlink:v7-ready',{detail:{build:BUILD}}));
   }catch(error){
     console.error('Smart Link Hub V7 boot failed',error);
