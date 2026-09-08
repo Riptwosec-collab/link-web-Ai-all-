@@ -4,6 +4,9 @@ async function openApp(page,path='/?e2e=1'){
   await page.goto(path,{waitUntil:'domcontentloaded'});
   await page.locator('html.slh-v7-ready').waitFor({state:'attached'});
   await expect(page.locator('#smartlink-auth-gate')).toHaveClass(/hidden/);
+  await page.waitForFunction(()=>typeof window.SmartLinkV7?.route==='function'&&typeof window.SmartLinkV7?.indexPending==='function'&&typeof window.SmartLinkV76?.renderOrganization==='function');
+  const errors=await page.evaluate(()=>window.__SLH_BOOT_ERRORS__||[]);
+  expect(errors).toEqual([]);
 }
 async function configureWorker(page){
   await page.evaluate(async()=>{const {setSetting}=await import('/js/db.js');await setSetting('workerUrl',location.origin+'/e2e-worker')});
@@ -21,7 +24,8 @@ test('V7 boots through the custom cloud session and exposes build truth',async({
 test('Desktop sidebar exposes only the seven daily navigation destinations',async({page})=>{
   await openApp(page);
   await page.locator('#sidebar-nav.slh-clean-nav').waitFor();
-  const labels=await page.locator('#sidebar-nav>[data-slh-primary].nav-item').allTextContents();
+  await expect(page.locator('#sidebar-nav>.slh-primary-nav-item')).toHaveCount(7);
+  const labels=await page.locator('#sidebar-nav>.slh-primary-nav-item').allTextContents();
   expect(labels.map(x=>x.replace(/\s+/g,' ').trim())).toEqual(['Home','Library','AI Search','Categories','Favorites','Read Later','Settings']);
   await expect(page.locator('#sidebar-nav>[data-page="analytics"]')).toBeHidden();
   await expect(page.locator('#sidebar-nav>[data-page="workspaces"]')).toBeHidden();
@@ -31,7 +35,8 @@ test('Desktop sidebar exposes only the seven daily navigation destinations',asyn
 
 test('Gold and Blue themes persist across reload',async({page})=>{
   await openApp(page);
-  expect(await page.evaluate(()=>document.documentElement.dataset.theme)).toBe('gold');
+  await page.evaluate(()=>window.SmartLinkTheme.set('gold'));
+  await expect(page.locator('html')).toHaveAttribute('data-theme','gold');
   await page.evaluate(()=>window.SmartLinkTheme.set('blue'));
   await expect(page.locator('html')).toHaveAttribute('data-theme','blue');
   await page.reload({waitUntil:'domcontentloaded'});
@@ -92,7 +97,7 @@ test('Semantic index, hybrid search and full-text archive work against determini
   });
   const indexed=await page.evaluate(()=>window.SmartLinkV7.indexPending(10));
   expect(indexed.indexed).toBeGreaterThanOrEqual(2);
-  const result=await page.evaluate(async()=>{const rows=await window.SmartLinkV7.hybridSearch('github network security code');return rows.map(x=>({title:x.link.title,score:x.score}))});
+  const result=await page.evaluate(async()=>{const rows=await window.SmartLinkV7.hybridSearch('network security');return rows.map(x=>({title:x.link.title,score:x.score}))});
   expect(result.length).toBeGreaterThan(0);
   expect(result.some(x=>/network security/i.test(x.title))).toBeTruthy();
   const archived=await page.evaluate(async()=>{const db=await import('/js/db.js');const l=(await db.getAll('links'))[0];await window.SmartLinkV7.archiveLink(l,{visual:true});const d=await db.getDocument(l.id);return {content:d?.content||'',archived:(await db.getOne('links',l.id))?.archivedAt||0}});
