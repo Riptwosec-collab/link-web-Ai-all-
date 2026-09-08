@@ -1,0 +1,30 @@
+name: Smart Link Hub Production Smoke
+
+on:
+  workflow_run:
+    workflows: ["Smart Link Hub V7 Verification"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-smoke:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify production build and V7 assets
+        env:
+          APP_URL: https://link-web-ai-all.aidsaras.workers.dev
+          EXPECTED_BUILD: slh-v7-20260909
+        run: |
+          set -euo pipefail
+          meta="$(curl --fail --silent --show-error --location --max-time 20 "$APP_URL/build-meta.json?smoke=$(date +%s)")"
+          page="$(curl --fail --silent --show-error --location --max-time 20 "$APP_URL/?smoke=$(date +%s)")"
+          node -e 'const m=JSON.parse(process.argv[1]); if(m.buildId!==process.env.EXPECTED_BUILD||m.version!=="7.0.0") { console.error(m); process.exit(1) }' "$meta"
+          printf '%s' "$page" | grep -q 'slh-v7-20260909'
+          printf '%s' "$page" | grep -q 'js/v7/boot.js'
+          printf '%s' "$page" | grep -q 'css/v7.css'
+          echo "Production is serving $EXPECTED_BUILD"
