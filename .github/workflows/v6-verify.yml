@@ -1,0 +1,55 @@
+name: Smart Link Hub V6 Verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          set -e
+          node --check js/db.js
+          node --check js/auto-cloud-sync.js
+          node --check js/auth-gate.js
+          node --check js/v6-platform.js
+          node --check js/v6-bridge.js
+          node --check js/v6-import.js
+          node --check js/v6-bulk-extra.js
+          node --check worker/src/index.js
+          node --check extension/popup.js
+      - name: JSON manifests
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('manifest.webmanifest','utf8'));JSON.parse(require('fs').readFileSync('extension/manifest.json','utf8'));console.log('JSON OK')"
+      - name: Verify V6 assets and contracts
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const need=(f)=>{if(!fs.existsSync(f))throw new Error('Missing '+f)};
+          [
+            'css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js','js/v6-import.js','js/v6-bulk-extra.js',
+            'extension/manifest.json','extension/popup.html','extension/popup.js','worker/src/index.js'
+          ].forEach(need);
+          const index=fs.readFileSync('index.html','utf8');
+          for(const s of ['css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js'])if(!index.includes(s))throw new Error('index missing '+s);
+          const db=fs.readFileSync('js/db.js','utf8');
+          for(const s of ["'trash'","'tombstones'","'syncQueue'",'restoreTrash','getSyncQueueCount'])if(!db.includes(s))throw new Error('db contract missing '+s);
+          const sync=fs.readFileSync('js/auto-cloud-sync.js','utf8');
+          for(const s of ['smartlink_state_put_v2','conflict','tombstones','getSyncQueueCount'])if(!sync.includes(s))throw new Error('sync contract missing '+s);
+          const worker=fs.readFileSync('worker/src/index.js','utf8');
+          for(const s of ['/api/ask','/api/ai-batch','unsafeHostname','privateIPv4'])if(!worker.includes(s))throw new Error('worker contract missing '+s);
+          const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
+          if(!manifest.share_target||!manifest.shortcuts?.length)throw new Error('PWA share target/shortcuts missing');
+          console.log('V6 contracts OK');
+          NODE
