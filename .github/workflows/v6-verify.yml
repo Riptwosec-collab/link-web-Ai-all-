@@ -23,7 +23,7 @@ jobs:
         run: |
           set -e
           for f in \
-            js/db.js js/auto-cloud-sync.js js/auth-gate.js \
+            js/db.js js/auto-cloud-sync.js js/auto-cloud-ui.js js/auth-gate.js \
             js/v6-platform.js js/v6-bridge.js js/v6-import.js js/v6-bulk-extra.js js/theme-v61.js \
             js/e2e-boot.js js/v7/core.js js/v7/search-worker.js js/v7/knowledge.js js/v7/mobile.js js/v7/boot.js \
             sw.js worker/src/index.js extension/popup.js extension/background.js playwright.config.js tests/v7.spec.js; do
@@ -37,7 +37,7 @@ jobs:
           const need=f=>{if(!fs.existsSync(f))throw new Error('Missing '+f)};
           const files=[
             'build-meta.json','manifest.webmanifest','package.json','share.html','_headers',
-            'css/v7.css','js/v7/boot.js','js/v7/core.js','js/v7/search-worker.js','js/v7/knowledge.js','js/v7/mobile.js','js/e2e-boot.js',
+            'css/v7.css','js/v7/boot.js','js/v7/core.js','js/v7/search-worker.js','js/v7/knowledge.js','js/v7/mobile.js','js/e2e-boot.js','js/auto-cloud-ui.js',
             'extension/manifest.json','extension/popup.html','extension/popup.js','extension/background.js',
             'worker/src/index.js','worker/wrangler.toml','worker/wrangler.browser.toml',
             'supabase/migrations/20260908171119_smartlink_v7_knowledge_memory.sql'
@@ -55,6 +55,8 @@ jobs:
           for(const s of ['normalizeUrl','utm_','duplicateGroups','parseQuery','fastSearch','search-worker.js','captureText','putDiagnostic','v7_capture'])if(!core.includes(s))throw new Error('core missing '+s);
           const knowledge=fs.readFileSync('js/v7/knowledge.js','utf8');
           for(const s of ['smartlink_embedding_put','smartlink_semantic_search','smartlink_document_put','smartlink_share_create','Duplicate Center','Import Wizard','AI Librarian','System Status','archiveLink','hybridSearch'])if(!knowledge.includes(s))throw new Error('knowledge missing '+s);
+          const nav=fs.readFileSync('js/auto-cloud-ui.js','utf8');
+          for(const s of ["PRIMARY=['home','library','ai','categories','favorites','read-later','settings']",'slh-clean-nav','AI Search','Categories','Read Later','slh-library-views','slh-settings-tools','Duplicate Review','System Status & Diagnostics','data-v7-mobile=\'categories\''])if(!nav.includes(s))throw new Error('simplified navigation missing '+s);
           const db=fs.readFileSync('js/db.js','utf8');
           for(const s of ['DB_VERSION=3',"'documents'","'visuals'","'diagnostics'","'trash'","'tombstones'","'syncQueue'",'restoreTrash','putDocument','getVisual'])if(!db.includes(s))throw new Error('db missing '+s);
           const worker=fs.readFileSync('worker/src/index.js','utf8');
