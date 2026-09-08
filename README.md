@@ -1,51 +1,163 @@
-# Smart Link Hub V5.1
+# Smart Link Hub V6
 
-Local-first intelligent web library with premium motion, rich link previews, analytics, keyboard navigation and optional cloud sync.
+A resilient, local-first AI web library for saving, organizing, searching and recovering links across devices. Every mutation is committed to IndexedDB first and then synchronized automatically to Supabase with conflict detection and version history.
 
-## Included
-- Persistent IndexedDB library, favorites, settings, edits, delete + undo and duplicate detection
-- Real collections with drag/drop, fuzzy full-library search and related links
-- Background-first link cards with logo/feature-image fallback and smart metadata repair
-- Premium GPU-friendly Aurora graphics, pointer spotlight, page/card transitions and touch feedback
-- Card actions simplified to **Favorite + More** with Open, Edit, Copy URL, Refresh Metadata, Move to Collection, Archive Snapshot and Delete/Undo
-- Insights dashboard with animated SVG activity chart, category donut, health ring, top collections, most-opened ranking and 7D/30D/90D ranges
-- JSON/CSV/Netscape HTML import/export plus ZIP backup
-- Link-health center and archive snapshots
-- Global Search: `Ctrl/Cmd + K`
-- Command Palette: `Ctrl/Cmd + P`
-- PWA install and offline cache
-- Optional Cloudflare Worker: metadata, Workers AI tags/summary, health checks and HTML snapshot excerpts
-- Optional Supabase auth/sync schema with RLS and workspace roles
+## V6 core guarantees
 
-## Navigation
-Main: **Home · Library · Collections · Favorites**
+- **Auto Save first** — add, edit, favorite, tag, move, archive, settings and delete mutations persist locally immediately.
+- **Automatic Cloud Sync** — no manual Push/Pull workflow. Offline changes queue and retry when connectivity returns.
+- **Conflict-safe revisions** — cloud writes include an expected revision; concurrent-device conflicts reload, merge and retry instead of blindly overwriting another device.
+- **Trash + tombstones** — deleted links are recoverable for 30 days and deletion markers prevent stale devices from resurrecting deleted data.
+- **Cloud version history** — up to 50 previous cloud states are retained per profile and can be restored from Cloud & Backup Center.
+- **Portable backups** — V6 JSON backup contains links, collections, settings, archives, workspaces, Trash/tombstones and events; V6 import merges the state and queues a cloud sync.
 
-Insights: **Analytics · Link Health**
+## Productivity
 
-More: **Workspaces / Advanced**
+- Home library intelligence with broken/unknown, uncategorized, Trash, Read Later and queued-sync signals.
+- Rich link cards with Favorite, Edit, Read Later and multi-select controls.
+- **Bulk actions:** favorite, Read Later, move collection, add tags, AI organize, Archive Snapshot, export and move to Trash.
+- **Read Later workflow:** Unread → Reading → Completed with progress and last-opened tracking.
+- Collections, drag/drop and **nested collections** using `parentId` without breaking existing collection IDs.
+- Workspaces remain compatible with existing project/collection groupings.
+- Link Health Center, snapshots/archive, Favorites and analytics.
+- Extended analytics with top domains and stale-link lifecycle signals.
+- Duplicate prevention on capture/import by normalized URL.
 
-Settings: **General · Data / Import / Export**
+## AI
 
-Archive is available as a Library sub-view rather than a top-level sidebar item.
+Cloudflare Worker V6 exposes:
 
-## Static app
-Serve the repository root with GitHub Pages, Cloudflare Pages, Vercel or any static host. `index.html` is the direct entry point.
+- `GET /api/metadata` — preview metadata.
+- `GET /api/health` — link availability.
+- `GET /api/snapshot` — bounded HTML/text snapshot.
+- `POST /api/ai` — classify one link.
+- `POST /api/ai-batch` — organize up to 80 links in bounded batches.
+- `POST /api/ask` — **Ask My Links**, grounded only in supplied saved-link context.
 
-## Performance
-V5.1 uses a lean performance layer with `content-visibility`, CSS containment, lazy images and motion based mainly on `transform`, `opacity`, and SVG stroke animation. Legacy V3/V5 logo-cover performance rules are no longer loaded.
+The Worker uses the configured Workers AI binding and has deterministic local/classification fallbacks. URL-fetch endpoints reject localhost, private/link-local IP ranges, internal hostnames, credentials in URLs and unsafe redirect targets, with response-size and timeout limits.
 
-## Cloudflare Worker (optional)
+## Search & command palette
+
+Press `Ctrl/Cmd + K` to search across:
+
+- title
+- URL/domain
+- description/summary
+- tags
+- category
+- collection name
+
+The V6 command palette also opens Home, Library, Favorites, Collections, Read Later, AI Search, Health, Archive, Trash, Cloud & Backup, Import/Export and Settings, and can trigger cloud sync, JSON backup and random-link actions.
+
+## Cloud login & security
+
+The current private profile selector includes **Mek (`mek`)**. V6 login records a human-readable device name and keeps the existing 6-digit PIN + lockout model.
+
+Cloud & Backup Center includes:
+
+- current local/cloud counts
+- pending mutation queue
+- cloud revision history
+- restore previous revision
+- active device sessions
+- logout one device
+- logout all other sessions
+- login audit history
+- Lock now / configurable inactivity auto-lock
+
+The browser uses a publishable Supabase key only. Profile/session/state tables remain RLS-enabled; the app accesses private data through narrow SECURITY DEFINER RPCs that validate the high-entropy custom session token. Direct anonymous table access is not part of the Smart Link Hub data path.
+
+## IndexedDB V6
+
+Database name remains `smart-link-hub-v3` so existing user data upgrades in place. Schema version 2 adds:
+
+- `trash`
+- `tombstones`
+- `syncQueue`
+
+Existing stores remain:
+
+- `links`
+- `collections`
+- `settings`
+- `events`
+- `archives`
+- `workspaces`
+
+## PWA
+
+`manifest.webmanifest` includes:
+
+- standalone installation
+- Add Link / Read Later / AI Search / Cloud shortcuts
+- Web Share Target (`Share → Smart Link Hub` where supported)
+- app launch handling
+
+The service worker uses network-first delivery for JS/CSS/manifest assets, V6 offline cache, Background Sync messaging and notification-click routing. App badge state is updated when supported.
+
+## Chrome / Edge extension
+
+The unpacked Manifest V3 extension is in `extension/`.
+
+To install locally:
+
+1. Open `chrome://extensions` or `edge://extensions`.
+2. Enable **Developer mode**.
+3. Choose **Load unpacked**.
+4. Select the repository's `extension` folder.
+5. Open any normal HTTP/HTTPS page and click **Smart Link Hub V6 Capture**.
+6. Choose optional **Add to Read Later**, then **Save tab**.
+
+The extension opens the production Smart Link Hub capture URL. The app deduplicates and Auto Saves locally; cloud sync proceeds after the current `Mek` session is available.
+
+## Cloudflare Worker deployment
+
 ```bash
 cd worker
 npx wrangler deploy
 ```
-Then paste the resulting Worker URL into **Settings → Cloudflare Worker**. The Worker uses the `AI` binding configured in `wrangler.toml`; if AI is unavailable, it returns a deterministic categorization fallback.
 
-## Supabase sync (optional)
-1. Create a Supabase project.
-2. Run `supabase/schema.sql` in the SQL editor.
-3. Enable Email/Password authentication.
-4. In Smart Link Hub Settings, enter the project URL and **public anon key** (never a service-role key).
-5. Sign up / sign in, then use Pull / Push in Workspaces.
+`worker/wrangler.toml` already declares the Workers AI binding:
 
-Cloud rows store user-owned app objects as JSONB; RLS isolates each user's library. Workspace membership tables include owner/editor/viewer roles for future shared-collection expansion.
+```toml
+[ai]
+binding = "AI"
+```
+
+After deployment, set the Worker endpoint in Smart Link Hub Settings. AI features fall back safely if the Worker or AI binding is unavailable.
+
+## Supabase
+
+The production application uses the custom Smart Link Hub RPC/session architecture already installed in the connected Supabase project, including:
+
+- `smartlink_login_v2`
+- `smartlink_state_get`
+- `smartlink_state_put_v2`
+- `smartlink_state_versions`
+- `smartlink_state_restore`
+- `smartlink_devices`
+- `smartlink_device_logout`
+- `smartlink_logout_others`
+- `smartlink_login_history`
+
+`supabase/schema.sql` in the repository is a **legacy normalized-auth schema** from the older optional integration and is not the source of truth for the current production V6 custom login/cloud path.
+
+## Verification
+
+`.github/workflows/v6-verify.yml` validates on pushes/PRs:
+
+- JavaScript syntax for V6 data, sync, auth, UI, Worker and extension files
+- JSON parsing for PWA and extension manifests
+- required V6 assets
+- Trash/Tombstone/Sync Queue contracts
+- conflict-safe RPC usage
+- AI endpoints and URL-fetch hardening
+- PWA Share Target and shortcuts
+
+## Hosting
+
+The static app can run on Cloudflare, GitHub Pages, Vercel or another static host. The configured repository homepage is:
+
+`https://link-web-ai-all.aidsaras.workers.dev/`
+
+Production Cloudflare deployment is separate from the GitHub commit itself; verify the host is serving the latest `main` commit after deployment.
