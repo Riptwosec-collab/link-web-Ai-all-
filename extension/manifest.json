@@ -1,11 +1,18 @@
 {
   "manifest_version":3,
-  "name":"Smart Link Hub V6 Capture",
-  "version":"6.0.0",
-  "description":"Save the current Chrome or Edge tab to Smart Link Hub with Auto Save and Cloud Sync.",
-  "permissions":["activeTab","tabs"],
+  "name":"Smart Link Hub V7 Capture",
+  "version":"7.0.0",
+  "description":"Capture the current Chrome or Edge tab into Smart Link Hub with tags, collection, favorite, Read Later, duplicate protection and Auto Cloud Sync.",
+  "permissions":["activeTab","tabs","storage"],
+  "background":{"service_worker":"background.js"},
   "action":{
     "default_title":"Save to Smart Link Hub",
     "default_popup":"popup.html"
+  },
+  "commands":{
+    "save-current-tab":{
+      "suggested_key":{"default":"Alt+Shift+S","mac":"Alt+Shift+S"},
+      "description":"Save the current tab to Smart Link Hub"
+    }
   }
 }
