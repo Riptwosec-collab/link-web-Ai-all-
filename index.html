@@ -4,11 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#060b13" />
-  <meta name="description" content="Smart Link Hub — local-first intelligent web library" />
-  <link rel="manifest" href="manifest.webmanifest?v=5.5.1" />
+  <meta name="description" content="Smart Link Hub V6 — resilient local-first AI web library with automatic cloud backup" />
+  <meta name="application-name" content="Smart Link Hub" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest?v=6" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon.svg" />
-  <title>Smart Link Hub V5.5.1</title>
+  <title>Smart Link Hub V6</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -19,13 +23,14 @@
   <script>
     tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{dark:'#060b13',panel:'#0b1420',accent:'#3b82f6',cyan:'#22d3ee',violet:'#8b5cf6'}}}}}
   </script>
-  <link rel="stylesheet" href="css/app.css?v=5.5.1" />
-  <link rel="stylesheet" href="css/performance-v51.css?v=5.5.1" />
-  <link rel="stylesheet" href="css/card-v12.css?v=5.5.1" />
-  <link rel="stylesheet" href="css/nav-v5.css?v=5.5.1" />
-  <link rel="stylesheet" href="css/premium-v51.css?v=5.5.1" />
-  <link rel="stylesheet" href="css/smooth-v52.css?v=5.5.1" />
-  <link rel="stylesheet" href="css/neo-v54.css?v=5.5.1" />
+  <link rel="stylesheet" href="css/app.css?v=6" />
+  <link rel="stylesheet" href="css/performance-v51.css?v=6" />
+  <link rel="stylesheet" href="css/card-v12.css?v=6" />
+  <link rel="stylesheet" href="css/nav-v5.css?v=6" />
+  <link rel="stylesheet" href="css/premium-v51.css?v=6" />
+  <link rel="stylesheet" href="css/smooth-v52.css?v=6" />
+  <link rel="stylesheet" href="css/neo-v54.css?v=6" />
+  <link rel="stylesheet" href="css/v6-platform.css?v=6" />
 </head>
 <body class="h-[100dvh] overflow-hidden bg-brand-dark text-slate-200 antialiased">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div><div class="noise"></div>
@@ -34,7 +39,7 @@
       <div class="px-5 pt-[max(20px,env(safe-area-inset-top))] pb-4">
         <button data-page="home" class="brand-button flex items-center gap-3 w-full text-left">
           <div class="brand-mark"><i class="ph-fill ph-link-simple text-white"></i></div>
-          <div><div class="font-semibold text-white tracking-tight">Smart Link Hub</div><div class="text-[9px] text-cyan-300/70 tracking-[.22em] uppercase">Intelligent library</div></div>
+          <div><div class="font-semibold text-white tracking-tight">Smart Link Hub</div><div class="text-[9px] text-cyan-300/70 tracking-[.22em] uppercase">Intelligent library · V6</div></div>
         </button>
       </div>
       <nav id="sidebar-nav" class="px-3 flex-1 overflow-y-auto space-y-1">
@@ -51,7 +56,7 @@
       </nav>
       <div class="p-3 pb-[max(12px,env(safe-area-inset-bottom))]">
         <div class="glass-panel p-4 rounded-2xl">
-          <div class="flex items-center justify-between"><span class="text-[10px] text-slate-500 uppercase tracking-widest">Library</span><span id="sync-pill" class="status-pill local"><span></span>Auto Cloud</span></div>
+          <div class="flex items-center justify-between"><span class="text-[10px] text-slate-500 uppercase tracking-widest">Library</span><span id="sync-pill" class="status-pill local"><span></span>Auto Save</span></div>
           <div class="grid grid-cols-3 gap-2 mt-3 text-center"><div><b id="side-links">0</b><small>Links</small></div><div><b id="side-favs">0</b><small>Favs</small></div><div><b id="side-cols">0</b><small>Lists</small></div></div>
         </div>
       </div>
@@ -71,7 +76,7 @@
           </label>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <button id="command-btn" class="command-trigger hidden lg:flex"><i class="ph ph-command"></i><span>Command</span><kbd>⌘P</kbd></button>
+          <button id="command-btn" class="command-trigger hidden lg:flex"><i class="ph ph-command"></i><span>Command</span><kbd>⌘K</kbd></button>
           <button id="add-link-btn" class="icon-btn accent" title="Add link"><i class="ph ph-plus"></i></button>
           <button id="install-btn" class="icon-btn hidden" title="Install app"><i class="ph ph-download-simple"></i></button>
         </div>
@@ -84,18 +89,19 @@
   <div id="command-overlay" class="command-overlay hidden" aria-hidden="true"></div>
   <input id="import-file" type="file" accept=".json,.csv,.html,.htm" class="hidden" />
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
-  <script src="js/auth-gate.js?v=5.5.1"></script>
-  <script type="module" src="js/app.js?v=5.5.1"></script>
-  <script type="module" src="js/nav-v5.js?v=5.5.1"></script>
-  <script type="module" src="js/instant-save-v9.js?v=5.5.1"></script>
-  <script type="module" src="js/metadata-repair.js?v=5.5.1"></script>
-  <script type="module" src="js/card-v12.js?v=5.5.1"></script>
-  <script type="module" src="js/auto-cloud-sync.js?v=5.5.1"></script>
-  <script src="js/auto-cloud-ui.js?v=5.5.1"></script>
-  <script src="js/smooth-v52.js?v=5.5.1"></script>
-  <script type="module" src="js/interaction-v53.js?v=5.5.1"></script>
-  <script type="module" src="js/analytics-v53.js?v=5.5.1"></script>
-  <script src="js/neo-v54.js?v=5.5.1"></script>
-  <script src="js/shortcuts-v51.js?v=5.5.1"></script>
+  <script src="js/auth-gate.js?v=6"></script>
+  <script type="module" src="js/app.js?v=6"></script>
+  <script type="module" src="js/nav-v5.js?v=6"></script>
+  <script type="module" src="js/instant-save-v9.js?v=6"></script>
+  <script type="module" src="js/metadata-repair.js?v=6"></script>
+  <script type="module" src="js/card-v12.js?v=6"></script>
+  <script type="module" src="js/auto-cloud-sync.js?v=6"></script>
+  <script src="js/auto-cloud-ui.js?v=6"></script>
+  <script src="js/smooth-v52.js?v=6"></script>
+  <script type="module" src="js/interaction-v53.js?v=6"></script>
+  <script type="module" src="js/analytics-v53.js?v=6"></script>
+  <script src="js/neo-v54.js?v=6"></script>
+  <script src="js/shortcuts-v51.js?v=6"></script>
+  <script type="module" src="js/v6-platform.js?v=6"></script>
 </body>
 </html>
