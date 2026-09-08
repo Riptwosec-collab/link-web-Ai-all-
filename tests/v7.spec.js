@@ -4,7 +4,7 @@ async function openApp(page,path='/?e2e=1'){
   await page.goto(path,{waitUntil:'domcontentloaded'});
   await page.locator('html.slh-v7-ready').waitFor({state:'attached'});
   await expect(page.locator('#smartlink-auth-gate')).toHaveClass(/hidden/);
-  await page.waitForFunction(()=>typeof window.SmartLinkV7?.route==='function'&&typeof window.SmartLinkV7?.indexPending==='function'&&typeof window.SmartLinkV76?.renderOrganization==='function');
+  await page.waitForFunction(()=>typeof window.SmartLinkV7?.route==='function'&&typeof window.SmartLinkV7?.indexPending==='function'&&typeof window.SmartLinkV76?.renderOrganization==='function'&&typeof window.SmartLinkNavigation?.route==='function');
   const errors=await page.evaluate(()=>window.__SLH_BOOT_ERRORS__||[]);
   expect(errors).toEqual([]);
 }
@@ -12,6 +12,13 @@ async function configureWorker(page){
   await page.evaluate(async()=>{const {setSetting}=await import('/js/db.js');await setSetting('workerUrl',location.origin+'/e2e-worker')});
 }
 async function linkCount(page){return page.evaluate(async()=>{const {getAll}=await import('/js/db.js');return (await getAll('links')).length})}
+
+async function clickPrimary(page,key,title){
+  const b=page.locator(`#sidebar-nav>[data-slh-route="${key}"]`);
+  await expect(b).toBeVisible();
+  await b.click();
+  await expect(page.locator('#page-title')).toHaveText(title);
+}
 
 test('V7 boots through the custom cloud session and exposes build truth',async({page})=>{
   await openApp(page);
@@ -23,7 +30,7 @@ test('V7 boots through the custom cloud session and exposes build truth',async({
 
 test('Desktop sidebar exposes only the seven daily navigation destinations',async({page})=>{
   await openApp(page);
-  await page.locator('#sidebar-nav.slh-clean-nav').waitFor();
+  await page.locator('#sidebar-nav.slh-v710-nav').waitFor();
   await expect(page.locator('#sidebar-nav>.slh-primary-nav-item')).toHaveCount(7);
   const labels=await page.locator('#sidebar-nav>.slh-primary-nav-item').allTextContents();
   expect(labels.map(x=>x.replace(/\s+/g,' ').trim())).toEqual(['Home','Library','AI Search','Categories','Favorites','Read Later','Settings']);
@@ -31,6 +38,17 @@ test('Desktop sidebar exposes only the seven daily navigation destinations',asyn
   await expect(page.locator('#sidebar-nav>[data-page="workspaces"]')).toBeHidden();
   await expect(page.locator('#v7-nav')).toBeHidden();
   await expect(page.locator('#v6-nav-marker')).toBeHidden();
+});
+
+test('All seven desktop primary menu destinations respond to real clicks',async({page})=>{
+  await openApp(page);
+  await clickPrimary(page,'library','Search');
+  await clickPrimary(page,'ai','Semantic AI');
+  await clickPrimary(page,'categories','Category Center');
+  await clickPrimary(page,'favorites','Favorites');
+  await clickPrimary(page,'read-later','Read Later');
+  await clickPrimary(page,'settings','Settings');
+  await clickPrimary(page,'home','Home');
 });
 
 test('Gold and Blue themes persist across reload',async({page})=>{
