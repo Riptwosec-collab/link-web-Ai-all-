@@ -1,6 +1,15 @@
 /* Smart Link Hub V5.5 — Auto Cloud only UI. No manual Push/Pull workflow. */
 (function(){
+  function removeV7HomeIntel(){
+    if(document.getElementById('slh-hide-v7-home-intel'))return;
+    const style=document.createElement('style');
+    style.id='slh-hide-v7-home-intel';
+    style.textContent='#v7-home-intel,.v7-home-intel{display:none!important}';
+    document.head.appendChild(style);
+  }
+
   function apply(){
+    removeV7HomeIntel();
     document.querySelectorAll('#cloud-pull,#cloud-push').forEach(el=>el.remove());
 
     const save=document.getElementById('save-cloud-config');
