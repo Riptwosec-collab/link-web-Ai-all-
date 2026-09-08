@@ -15,7 +15,6 @@
   <link rel="apple-touch-icon" href="icons/icon.svg" />
   <title>Smart Link Hub V7</title>
   <script>
-    // Apply the saved theme before first paint to prevent a blue/gold flash.
     (()=>{try{const t=localStorage.getItem('slh_theme_v61')||localStorage.getItem('smartlink_theme')||'gold';document.documentElement.dataset.theme=t==='blue'?'blue':'gold'}catch(_){document.documentElement.dataset.theme='gold'}})();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,20 +102,19 @@
   <script src="js/auth-gate.js?v=7"></script>
   <script type="module" src="js/v7/boot.js?v=7.6"></script>
   <script type="module" src="js/app.js?v=7"></script>
-  <script type="module" src="js/nav-v5.js?v=7"></script>
+  <script type="module" src="js/nav-v5.js?v=7.10"></script>
   <script type="module" src="js/instant-save-v9.js?v=7"></script>
   <script type="module" src="js/metadata-repair.js?v=7"></script>
   <script type="module" src="js/card-v12.js?v=7"></script>
   <script type="module" src="js/auto-cloud-sync.js?v=7"></script>
-  <script src="js/auto-cloud-ui.js?v=7"></script>
-  <script src="js/nav-hotfix-v79.js?v=7.9"></script>
+  <script src="js/auto-cloud-ui.js?v=7.10"></script>
   <script src="js/smooth-v52.js?v=7"></script>
   <script type="module" src="js/interaction-v53.js?v=7"></script>
   <script type="module" src="js/analytics-v53.js?v=7"></script>
   <script src="js/neo-v54.js?v=7"></script>
   <script src="js/shortcuts-v51.js?v=7"></script>
   <script type="module" src="js/v6-platform.js?v=7"></script>
-  <script src="js/v6-bridge.js?v=7"></script>
+  <script src="js/v6-bridge.js?v=7.10"></script>
   <script src="js/theme-v61.js?v=7"></script>
 </body>
 </html>
