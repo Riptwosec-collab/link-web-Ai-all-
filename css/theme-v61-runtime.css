@@ -1,0 +1,187 @@
+/* Smart Link Hub V6.1 — runtime-injected UI theme bridge.
+   !important is intentional because auth-gate.js injects its own stylesheet after page load. */
+
+#smartlink-auth-gate {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(var(--accent-rgb), .15), transparent 29%),
+    radial-gradient(circle at 82% 82%, rgba(var(--accent-rgb), .08), transparent 31%),
+    rgba(var(--bg-rgb), .988) !important;
+}
+
+#smartlink-auth-gate .slh-login {
+  border-color: var(--border) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(var(--accent-rgb), .06), transparent 32%),
+    linear-gradient(145deg, rgba(var(--panel2-rgb), .95), rgba(var(--panel-rgb), .99)) !important;
+  box-shadow: 0 35px 120px rgba(0,0,0,.60), 0 0 72px rgba(var(--accent-rgb), .065) !important;
+}
+
+#smartlink-auth-gate .slh-login:before {
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(var(--accent-rgb), .16),
+    transparent 48%,
+    rgba(var(--accent-rgb), .09),
+    transparent 75%
+  ) !important;
+}
+
+#smartlink-auth-gate .slh-logo {
+  color: #080808 !important;
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent), var(--accent2)) !important;
+  box-shadow: 0 0 36px var(--glow), inset 0 1px 0 rgba(255,255,255,.38) !important;
+}
+
+#smartlink-auth-gate .slh-kicker,
+#smartlink-auth-gate .slh-secure {
+  color: var(--accent2) !important;
+}
+
+#smartlink-auth-gate .slh-login h1 {
+  color: var(--text) !important;
+}
+
+#smartlink-auth-gate .slh-login p,
+#smartlink-auth-gate .slh-status,
+#smartlink-auth-gate .slh-field label {
+  color: var(--muted) !important;
+}
+
+#smartlink-auth-gate .slh-field input,
+#smartlink-auth-gate .slh-field select {
+  color: var(--text) !important;
+  background-color: var(--input) !important;
+  border-color: var(--border) !important;
+}
+
+#smartlink-auth-gate .slh-field select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--accent2) 50%),
+    linear-gradient(135deg, var(--accent2) 50%, transparent 50%) !important;
+}
+
+#smartlink-auth-gate .slh-field select option {
+  background: var(--bg2) !important;
+  color: var(--text) !important;
+}
+
+#smartlink-auth-gate .slh-field input:focus,
+#smartlink-auth-gate .slh-field select:focus {
+  border-color: var(--border-strong) !important;
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), .06), 0 0 30px rgba(var(--accent-rgb), .05) !important;
+}
+
+#smartlink-auth-gate .slh-profile-dot {
+  color: #080808 !important;
+  border-color: var(--accent-line) !important;
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent), var(--accent2)) !important;
+  box-shadow: 0 0 20px rgba(var(--accent-rgb), .12) !important;
+}
+
+#smartlink-auth-gate .slh-submit {
+  color: #080808 !important;
+  background: linear-gradient(100deg, var(--accent-dark), var(--accent), var(--accent2)) !important;
+  box-shadow: 0 12px 34px var(--shadow-accent), 0 0 30px rgba(var(--accent-rgb), .10) !important;
+}
+
+#smartlink-auth-gate .slh-submit:hover {
+  box-shadow: 0 14px 40px var(--glow), 0 0 34px rgba(var(--accent-rgb), .12) !important;
+}
+
+#smartlink-auth-gate .slh-foot {
+  border-color: var(--border) !important;
+  color: var(--muted-2) !important;
+}
+
+/* Cloud user dropdown injected by auth-gate.js */
+#smartlink-user-wrap .slh-user-button {
+  color: var(--muted) !important;
+  border-color: var(--border) !important;
+  background: rgba(255,255,255,.025) !important;
+}
+
+#smartlink-user-wrap .slh-user-button:hover,
+#smartlink-user-wrap .slh-user-button.open {
+  color: var(--text) !important;
+  border-color: var(--accent-line) !important;
+  background: var(--accent-soft) !important;
+}
+
+#smartlink-user-wrap .slh-user-menu {
+  border-color: var(--border) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(var(--accent-rgb), .055), transparent 35%),
+    rgba(var(--panel2-rgb), .985) !important;
+  box-shadow: 0 24px 76px rgba(0,0,0,.5), 0 0 34px rgba(var(--accent-rgb), .035) !important;
+}
+
+#smartlink-user-wrap .slh-user-card {
+  border-color: var(--border) !important;
+}
+
+#smartlink-user-wrap .slh-user-card b {
+  color: var(--text) !important;
+}
+
+#smartlink-user-wrap .slh-user-card small,
+#smartlink-user-wrap .slh-menu-action {
+  color: var(--muted) !important;
+}
+
+#smartlink-user-wrap .slh-menu-action:hover {
+  color: var(--text) !important;
+  background: var(--accent-soft) !important;
+}
+
+#smartlink-user-wrap .slh-menu-action.danger:hover {
+  color: #fda4af !important;
+  background: rgba(239,68,68,.09) !important;
+}
+
+/* Theme settings card */
+#slh-theme-settings {
+  overflow: hidden;
+  position: relative;
+}
+
+#slh-theme-settings:after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: -100px;
+  top: -120px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), .11), transparent 68%);
+}
+
+#slh-theme-settings > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Runtime cloud UI and status accents */
+[data-smartlink-cloud-center],
+[data-smartlink-sync],
+[data-smartlink-lock] {
+  accent-color: var(--accent);
+}
+
+.cloud-dot,
+.sync-dot,
+[data-cloud-status] i,
+[data-sync-status] i {
+  color: var(--accent) !important;
+}
+
+/* Form focus rings from runtime-created controls */
+#modal-root input:focus,
+#modal-root textarea:focus,
+#modal-root select:focus,
+#dynamic-content input:focus,
+#dynamic-content textarea:focus,
+#dynamic-content select:focus {
+  outline-color: var(--accent) !important;
+}
