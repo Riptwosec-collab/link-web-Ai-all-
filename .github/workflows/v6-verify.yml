@@ -1,4 +1,4 @@
-name: Smart Link Hub V6 Verification
+name: Smart Link Hub V7 Verification
 
 on:
   push:
@@ -12,11 +12,13 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
       - name: JavaScript syntax
         run: |
           set -e
@@ -28,13 +30,28 @@ jobs:
           node --check js/v6-import.js
           node --check js/v6-bulk-extra.js
           node --check js/theme-v61.js
+          node --check js/e2e-boot.js
+          node --check js/v7/core.js
+          node --check js/v7/search-worker.js
+          node --check js/v7/knowledge.js
+          node --check js/v7/mobile.js
+          node --check js/v7/boot.js
           node --check sw.js
           node --check worker/src/index.js
           node --check extension/popup.js
+          node --check extension/background.js
+          node --check playwright.config.js
+          node --check tests/v7.spec.js
+
       - name: JSON manifests
         run: |
-          node -e "JSON.parse(require('fs').readFileSync('manifest.webmanifest','utf8'));JSON.parse(require('fs').readFileSync('extension/manifest.json','utf8'));console.log('JSON OK')"
-      - name: Verify V6 assets, database and contracts
+          node <<'NODE'
+          const fs=require('fs');
+          for(const file of ['manifest.webmanifest','extension/manifest.json','build-meta.json','package.json'])JSON.parse(fs.readFileSync(file,'utf8'));
+          console.log('JSON OK');
+          NODE
+
+      - name: Verify V7 assets, database and contracts
         run: |
           node <<'NODE'
           const fs=require('fs');
@@ -42,22 +59,31 @@ jobs:
           const files=[
             'css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js','js/v6-import.js','js/v6-bulk-extra.js',
             'css/theme-v61.css','css/theme-v61-legacy.css','css/theme-v61-runtime.css','js/theme-v61.js',
-            'extension/manifest.json','extension/popup.html','extension/popup.js','worker/src/index.js',
+            'css/v7.css','js/v7/boot.js','js/v7/core.js','js/v7/search-worker.js','js/v7/knowledge.js','js/v7/mobile.js','js/e2e-boot.js',
+            'build-meta.json','share.html','package.json','playwright.config.js','tests/v7.spec.js',
+            'extension/manifest.json','extension/popup.html','extension/popup.js','extension/background.js',
+            'worker/src/index.js','worker/wrangler.toml','worker/wrangler.browser.toml',
             'supabase/migrations/20260908000028_smartlink_cloud_state_history_v2.sql',
             'supabase/migrations/20260908000100_smartlink_v6_cloud_safety_and_devices.sql',
             'supabase/migrations/20260908000110_smartlink_v6_explicit_data_api_deny.sql',
-            'supabase/migrations/20260908000120_smartlink_v6_login_audit_index.sql'
+            'supabase/migrations/20260908000120_smartlink_v6_login_audit_index.sql',
+            'supabase/migrations/20260908171119_smartlink_v7_knowledge_memory.sql'
           ];
           files.forEach(need);
 
           const index=fs.readFileSync('index.html','utf8');
           for(const s of [
             'css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js',
-            'css/theme-v61.css','css/theme-v61-legacy.css','css/theme-v61-runtime.css','js/theme-v61.js'
+            'css/theme-v61.css','css/theme-v61-legacy.css','css/theme-v61-runtime.css','js/theme-v61.js',
+            'css/v7.css','js/v7/boot.js','js/e2e-boot.js','slh-v7-20260909'
           ])if(!index.includes(s))throw new Error('index missing '+s);
           if(index.indexOf('css/theme-v61.css')<index.indexOf('css/v6-platform.css'))throw new Error('theme CSS must load after V6 CSS');
-          if(index.indexOf('css/theme-v61-runtime.css')<index.indexOf('css/theme-v61.css'))throw new Error('runtime theme bridge must load last');
-          if(!index.includes("document.documentElement.dataset.theme"))throw new Error('first-paint theme bootstrap missing');
+          if(index.indexOf('css/v7.css')<index.indexOf('css/theme-v61-runtime.css'))throw new Error('V7 CSS must load after theme compatibility CSS');
+          if(index.indexOf('js/v7/boot.js')>index.indexOf('js/v6-platform.js'))throw new Error('V7 runtime must register before V6 platform controller');
+          if(!index.includes('document.documentElement.dataset.theme'))throw new Error('first-paint theme bootstrap missing');
+
+          const meta=JSON.parse(fs.readFileSync('build-meta.json','utf8'));
+          if(meta.version!=='7.0.0'||meta.buildId!=='slh-v7-20260909'||meta.schema!==7)throw new Error('V7 build metadata invalid');
 
           const themeCss=fs.readFileSync('css/theme-v61.css','utf8');
           for(const s of [
@@ -71,45 +97,64 @@ jobs:
 
           const legacyTheme=fs.readFileSync('css/theme-v61-legacy.css','utf8');
           for(const s of ['--v51-cyan: var(--accent)','--n54-cyan: var(--accent)','#v51-visual-layer','.v51-action-menu','.v51-metric-card','.v12-title-copy p'])if(!legacyTheme.includes(s))throw new Error('legacy theme bridge missing '+s);
-
           const runtimeTheme=fs.readFileSync('css/theme-v61-runtime.css','utf8');
           for(const s of ['#smartlink-auth-gate','#smartlink-user-wrap','.slh-submit','#slh-theme-settings'])if(!runtimeTheme.includes(s))throw new Error('runtime theme bridge missing '+s);
-
           const themeJs=fs.readFileSync('js/theme-v61.js','utf8');
-          for(const s of ['Obsidian Gold','Midnight Blue','slh_theme_v61','setSetting','getSetting','injectHeaderSwitcher','injectLoginSwitcher','injectSettingsCard','SmartLinkTheme','requestAnimationFrame'])if(!themeJs.includes(s))throw new Error('theme controller missing '+s);
+          for(const s of ['Obsidian Gold','Midnight Blue','slh_theme_v61','setSetting','getSetting','SmartLinkTheme'])if(!themeJs.includes(s))throw new Error('theme controller missing '+s);
 
-          const sw=fs.readFileSync('sw.js','utf8');
-          for(const s of ['slh-v6.1-dual-theme','./css/theme-v61.css','./css/theme-v61-legacy.css','./css/theme-v61-runtime.css','./js/theme-v61.js'])if(!sw.includes(s))throw new Error('service worker theme cache missing '+s);
+          const v7css=fs.readFileSync('css/v7.css','utf8');
+          for(const s of ['.v7-mobile-nav','.v7-command','.v7-status-grid','.v7-result-list','content-visibility:auto'])if(!v7css.includes(s))throw new Error('V7 CSS contract missing '+s);
+          const core=fs.readFileSync('js/v7/core.js','utf8');
+          for(const s of ['slh-v7-20260909','normalizeUrl','utm_','duplicateGroups','parseQuery','domain','Ctrl','fastSearch','search-worker.js','captureText','putDiagnostic'])if(!core.includes(s))throw new Error('V7 core contract missing '+s);
+          const knowledge=fs.readFileSync('js/v7/knowledge.js','utf8');
+          for(const s of ['smartlink_embedding_put','smartlink_semantic_search','smartlink_document_put','smartlink_share_create','Duplicate Center','Import Wizard','AI Librarian','System Status','archiveLink','hybridSearch'])if(!knowledge.includes(s))throw new Error('V7 knowledge contract missing '+s);
 
           const db=fs.readFileSync('js/db.js','utf8');
-          for(const s of ["'trash'","'tombstones'","'syncQueue'",'restoreTrash','getSyncQueueCount'])if(!db.includes(s))throw new Error('db contract missing '+s);
+          for(const s of ['DB_VERSION=3',"'documents'","'visuals'","'diagnostics'",'normalizedUrl','readingState','putDiagnostic','putDocument','getVisual',"version:7"])if(!db.includes(s))throw new Error('V7 DB contract missing '+s);
+          for(const s of ["'trash'","'tombstones'","'syncQueue'",'restoreTrash','getSyncQueueCount'])if(!db.includes(s))throw new Error('V6 safety DB contract missing '+s);
 
           const sync=fs.readFileSync('js/auto-cloud-sync.js','utf8');
           for(const s of ['smartlink_state_put_v2','conflict','tombstones','getSyncQueueCount'])if(!sync.includes(s))throw new Error('sync contract missing '+s);
 
           const worker=fs.readFileSync('worker/src/index.js','utf8');
-          for(const s of ['/api/ask','/api/ai-batch','unsafeHostname','privateIPv4'])if(!worker.includes(s))throw new Error('worker contract missing '+s);
+          for(const s of ['/api/status','/api/archive','/api/embed','/api/rerank','/api/ask','@cf/baai/bge-m3','@cf/baai/bge-reranker-base',"redirect:'manual'",'blocked_redirect','unsafeHostname','privateIPv4','jsonLdInfo','readingMinutes'])if(!worker.includes(s))throw new Error('V7 worker contract missing '+s);
+          const browserToml=fs.readFileSync('worker/wrangler.browser.toml','utf8');
+          if(!browserToml.includes('[browser]')||!browserToml.includes('binding = "BROWSER"'))throw new Error('optional Browser Run binding missing');
 
           const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
-          if(!manifest.share_target||!manifest.shortcuts?.length)throw new Error('PWA share target/shortcuts missing');
+          if(manifest.name!=='Smart Link Hub V7'||!manifest.share_target||manifest.shortcuts?.length<4)throw new Error('V7 PWA manifest incomplete');
           if(manifest.theme_color!=='#020304'||manifest.background_color!=='#020304')throw new Error('PWA default theme color must match Obsidian Gold');
+
+          const extension=JSON.parse(fs.readFileSync('extension/manifest.json','utf8'));
+          if(extension.version!=='7.0.0'||!extension.background?.service_worker||!extension.permissions.includes('contextMenus')||!extension.commands?.['save-current-tab'])throw new Error('Extension V2/V7 contract missing');
+          const popup=fs.readFileSync('extension/popup.js','utf8'),background=fs.readFileSync('extension/background.js','utf8');
+          for(const s of ['collectionId','readLater','favorite','tags','v7capture'])if(!popup.includes(s))throw new Error('extension popup missing '+s);
+          for(const s of ['contextMenus','save-current-tab','v7capture'])if(!background.includes(s))throw new Error('extension background missing '+s);
+
+          const sw=fs.readFileSync('sw.js','utf8');
+          for(const s of ['slh-v7-knowledge-memory','./css/v7.css','./js/v7/boot.js','./js/v7/search-worker.js','./build-meta.json','./share.html'])if(!sw.includes(s))throw new Error('V7 service worker cache missing '+s);
 
           const migrationText=files.filter(f=>f.endsWith('.sql')).map(f=>fs.readFileSync(f,'utf8')).join('\n');
           for(const s of [
             'smartlink_cloud_state_history','smartlink_state_put_v2','smartlink_state_restore',
-            'smartlink_devices','smartlink_login_history','smartlink_direct_api_deny',
-            'smartlink_login_audit_profile_id_created_idx'
+            'smartlink_devices','smartlink_login_history','smartlink_direct_api_deny','smartlink_login_audit_profile_id_created_idx',
+            'smartlink_documents','smartlink_embeddings','extensions.vector(1024)','using hnsw','smartlink_semantic_search','smartlink_share_create','smartlink_share_get','smartlink_documents_direct_api_deny'
           ])if(!migrationText.includes(s))throw new Error('migration contract missing '+s);
           if(!/security definer/i.test(migrationText)||!/set search_path to ''/i.test(migrationText))throw new Error('SECURITY DEFINER hardening missing');
-          if(!/revoke all on table public\.smartlink_cloud_state from anon, authenticated/i.test(migrationText))throw new Error('direct Data API deny contract missing');
+          if(!/revoke all on table public\.smartlink_cloud_state from anon, authenticated/i.test(migrationText))throw new Error('cloud direct Data API deny contract missing');
+          if(!/revoke all on table public\.smartlink_embeddings from public, anon, authenticated/i.test(migrationText))throw new Error('V7 vector direct Data API deny contract missing');
 
-          console.log('V6 + dual-theme contracts OK');
+          const e2e=fs.readFileSync('js/e2e-boot.js','utf8');
+          if(!e2e.includes("['localhost','127.0.0.1','::1']")||!e2e.includes("get('e2e')==='1'"))throw new Error('E2E harness must stay localhost-only and opt-in');
+
+          console.log('V7 + V6 compatibility contracts OK');
           NODE
+
       - name: Secret hygiene guard
         run: |
           node <<'NODE'
           const fs=require('fs'),path=require('path');
-          const ignoredDirs=new Set(['.git','node_modules','.github']);
+          const ignoredDirs=new Set(['.git','node_modules','.github','playwright-report','test-results']);
           const ignoredExt=new Set(['.md','.yml','.yaml','.png','.jpg','.jpeg','.gif','.webp','.ico','.zip','.pdf']);
           const patterns=[
             ['Supabase service role env',/SUPABASE_SERVICE_ROLE_KEY\s*[=:]/i],
@@ -134,3 +179,22 @@ jobs:
           if(hits.length){console.error(hits.join('\n'));process.exit(1)}
           console.log('No privileged secret patterns detected.');
           NODE
+
+      - name: Install Playwright
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Browser E2E
+        run: npm run test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+          retention-days: 7
