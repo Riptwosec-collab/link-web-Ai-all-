@@ -1,4 +1,6 @@
-/* Smart Link Hub V5 navigation layer — reorganizes routes without removing legacy features. */
+/* Smart Link Hub V5 navigation layer — legacy routes only.
+ * V6/V7/V7.6 own their namespaces and must never be decorated as Home.
+ */
 const $=(q,r=document)=>r.querySelector(q);
 const $$=(q,r=document)=>[...r.querySelectorAll(q)];
 let navQueued=false;
@@ -18,6 +20,7 @@ const routeConfig={
 };
 
 function route(){return location.hash.slice(1)||'home'}
+function modernRoute(name=route()){return /^(?:v6-|v7-|v76-)/.test(String(name||''))}
 function go(name){if(route()===name){decorate();return}location.hash=name}
 
 function tabsHTML(items,current){
@@ -49,84 +52,38 @@ function setHero(current){
   }
 }
 
-function syncSidebar(active){
-  $$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.page===active));
-}
-
-function addContextTabs(cfg,current,shell){
-  if(!shell||!cfg.tabs?.length)return;
-  const bar=$('.v5-context-tabs',shell);
-  if(bar){
-    $$('[data-v5-route]',bar).forEach(b=>b.classList.toggle('active',b.dataset.v5Route===current));
-    return;
-  }
-  shell.insertAdjacentHTML('afterbegin',tabsHTML(cfg.tabs,current));
-}
-
-function decorateHome(){
-  const b=$('[data-go="search"]');
-  if(b&&!b.dataset.v5Label){b.dataset.v5Label='1';b.innerHTML='Open library <i class="ph ph-arrow-right"></i>'}
-}
+function syncSidebar(active){$$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.page===active))}
+function addContextTabs(cfg,current,shell){if(!shell||!cfg.tabs?.length)return;const bar=$('.v5-context-tabs',shell);if(bar){$$('[data-v5-route]',bar).forEach(b=>b.classList.toggle('active',b.dataset.v5Route===current));return}shell.insertAdjacentHTML('afterbegin',tabsHTML(cfg.tabs,current))}
+function decorateHome(){const b=$('[data-go="search"]');if(b&&!b.dataset.v5Label){b.dataset.v5Label='1';b.innerHTML='Open library <i class="ph ph-arrow-right"></i>'}}
 
 function decorate(){
   navQueued=false;
-  const current=route(),cfg=routeConfig[current]||routeConfig.home;
+  const current=route();
+  // Critical ownership boundary: V5 must not rewrite headers, active states or
+  // page shells rendered by V6, V7 or V7.6. Previously an unknown #v7-* hash
+  // fell back to routeConfig.home and made working pages look stuck on Home.
+  if(modernRoute(current))return;
+  const cfg=routeConfig[current]||routeConfig.home;
   const eye=$('#page-eyebrow'),title=$('#page-title');
   if(eye)eye.textContent=cfg.eye;if(title)title.textContent=cfg.title;
   syncSidebar(cfg.active);
-
-  const shell=$('#dynamic-content .page-shell');
-  if(!shell)return;
+  const shell=$('#dynamic-content .page-shell');if(!shell)return;
   if(shell.dataset.v5Route===current)return;
   shell.dataset.v5Route=current;
-
-  addContextTabs(cfg,current,shell);
-  setHero(current);
-  if(current==='home')decorateHome();
+  addContextTabs(cfg,current,shell);setHero(current);if(current==='home')decorateHome();
 }
 
 function scheduleDecorate(){if(navQueued)return;navQueued=true;requestAnimationFrame(()=>setTimeout(decorate,20))}
-
-function applyHeaderSearch(focus=true){
-  const global=$('#global-search');if(!global)return;
-  const q=global.value.trim();
-  const target=$('#search-input');
-  if(target){
-    if(target.value!==q)target.value=q;
-    target.dispatchEvent(new Event('input',{bubbles:true}));
-    if(focus)target.focus({preventScroll:true});
-  }
-}
-
+function applyHeaderSearch(focus=true){const global=$('#global-search');if(!global)return;const q=global.value.trim(),target=$('#search-input');if(target){if(target.value!==q)target.value=q;target.dispatchEvent(new Event('input',{bubbles:true}));if(focus)target.focus({preventScroll:true})}}
 function startSearch(){
   const input=$('#global-search');if(!input)return;
-  input.addEventListener('input',()=>{
-    clearTimeout(searchTimer);
-    searchTimer=setTimeout(()=>{
-      if(route()!=='search'){go('search');setTimeout(()=>applyHeaderSearch(false),90)}
-      else applyHeaderSearch(false);
-    },120);
-  });
-  input.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){
-      e.preventDefault();
-      if(route()!=='search')go('search');
-      setTimeout(()=>applyHeaderSearch(true),70);
-    }
-  });
+  input.addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{if(route()!=='search'){go('search');setTimeout(()=>applyHeaderSearch(false),90)}else applyHeaderSearch(false)},120)});
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(route()!=='search')go('search');setTimeout(()=>applyHeaderSearch(true),70)}});
   input.addEventListener('focus',()=>input.closest('.v5-global-search')?.classList.add('focused'));
   input.addEventListener('blur',()=>input.closest('.v5-global-search')?.classList.remove('focused'));
 }
 
-document.addEventListener('click',e=>{
-  const b=e.target.closest?.('[data-v5-route]');if(!b)return;
-  e.preventDefault();go(b.dataset.v5Route);
-});
+document.addEventListener('click',e=>{const b=e.target.closest?.('[data-v5-route]');if(!b)return;e.preventDefault();go(b.dataset.v5Route)});
 window.addEventListener('hashchange',scheduleDecorate);
-
-function observe(){
-  const root=$('#dynamic-content');if(!root)return setTimeout(observe,100);
-  new MutationObserver(scheduleDecorate).observe(root,{childList:true});
-  scheduleDecorate();
-}
+function observe(){const root=$('#dynamic-content');if(!root)return setTimeout(observe,100);new MutationObserver(scheduleDecorate).observe(root,{childList:true});scheduleDecorate()}
 startSearch();observe();
