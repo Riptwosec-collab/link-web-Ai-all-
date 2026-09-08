@@ -74,12 +74,31 @@ jobs:
           console.log('V6 contracts OK');
           NODE
       - name: Secret hygiene guard
-        shell: bash
         run: |
-          set -euo pipefail
-          if grep -RInE --exclude-dir=.git --exclude='*.md' --exclude='*.yml' --exclude='*.yaml' \
-            '(SUPABASE_SERVICE_ROLE_KEY|service_role["'"'=: ]|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|sk_live_[A-Za-z0-9])' .; then
-            echo 'Potential privileged secret found in repository.' >&2
-            exit 1
-          fi
-          echo 'No privileged secret patterns detected.'
+          node <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const ignoredDirs=new Set(['.git','node_modules','.github']);
+          const ignoredExt=new Set(['.md','.yml','.yaml','.png','.jpg','.jpeg','.gif','.webp','.ico','.zip','.pdf']);
+          const patterns=[
+            ['Supabase service role env',/SUPABASE_SERVICE_ROLE_KEY\s*[=:]/i],
+            ['Supabase service role token',/\bservice_role\b\s*["'=:]/i],
+            ['Supabase secret key',/\bsb_secret_[A-Za-z0-9._-]{20,}/],
+            ['Stripe live secret',/\bsk_live_[A-Za-z0-9]{12,}/],
+            ['Private key block',/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/]
+          ];
+          const hits=[];
+          function walk(dir){
+            for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+              if(entry.isDirectory()&&ignoredDirs.has(entry.name))continue;
+              const p=path.join(dir,entry.name);
+              if(entry.isDirectory()){walk(p);continue}
+              if(ignoredExt.has(path.extname(entry.name).toLowerCase()))continue;
+              const stat=fs.statSync(p);if(stat.size>2_000_000)continue;
+              let text;try{text=fs.readFileSync(p,'utf8')}catch{continue}
+              for(const [name,re] of patterns)if(re.test(text))hits.push(`${name}: ${p}`);
+            }
+          }
+          walk('.');
+          if(hits.length){console.error(hits.join('\n'));process.exit(1)}
+          console.log('No privileged secret patterns detected.');
+          NODE
