@@ -32,24 +32,54 @@ jobs:
       - name: JSON manifests
         run: |
           node -e "JSON.parse(require('fs').readFileSync('manifest.webmanifest','utf8'));JSON.parse(require('fs').readFileSync('extension/manifest.json','utf8'));console.log('JSON OK')"
-      - name: Verify V6 assets and contracts
+      - name: Verify V6 assets, database and contracts
         run: |
           node <<'NODE'
           const fs=require('fs');
           const need=(f)=>{if(!fs.existsSync(f))throw new Error('Missing '+f)};
-          [
+          const files=[
             'css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js','js/v6-import.js','js/v6-bulk-extra.js',
-            'extension/manifest.json','extension/popup.html','extension/popup.js','worker/src/index.js'
-          ].forEach(need);
+            'extension/manifest.json','extension/popup.html','extension/popup.js','worker/src/index.js',
+            'supabase/migrations/20260908000028_smartlink_cloud_state_history_v2.sql',
+            'supabase/migrations/20260908000100_smartlink_v6_cloud_safety_and_devices.sql',
+            'supabase/migrations/20260908000110_smartlink_v6_explicit_data_api_deny.sql',
+            'supabase/migrations/20260908000120_smartlink_v6_login_audit_index.sql'
+          ];
+          files.forEach(need);
+
           const index=fs.readFileSync('index.html','utf8');
           for(const s of ['css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js'])if(!index.includes(s))throw new Error('index missing '+s);
+
           const db=fs.readFileSync('js/db.js','utf8');
           for(const s of ["'trash'","'tombstones'","'syncQueue'",'restoreTrash','getSyncQueueCount'])if(!db.includes(s))throw new Error('db contract missing '+s);
+
           const sync=fs.readFileSync('js/auto-cloud-sync.js','utf8');
           for(const s of ['smartlink_state_put_v2','conflict','tombstones','getSyncQueueCount'])if(!sync.includes(s))throw new Error('sync contract missing '+s);
+
           const worker=fs.readFileSync('worker/src/index.js','utf8');
           for(const s of ['/api/ask','/api/ai-batch','unsafeHostname','privateIPv4'])if(!worker.includes(s))throw new Error('worker contract missing '+s);
+
           const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
           if(!manifest.share_target||!manifest.shortcuts?.length)throw new Error('PWA share target/shortcuts missing');
+
+          const migrationText=files.filter(f=>f.endsWith('.sql')).map(f=>fs.readFileSync(f,'utf8')).join('\n');
+          for(const s of [
+            'smartlink_cloud_state_history','smartlink_state_put_v2','smartlink_state_restore',
+            'smartlink_devices','smartlink_login_history','smartlink_direct_api_deny',
+            'smartlink_login_audit_profile_id_created_idx'
+          ])if(!migrationText.includes(s))throw new Error('migration contract missing '+s);
+          if(!/security definer/i.test(migrationText)||!/set search_path to ''/i.test(migrationText))throw new Error('SECURITY DEFINER hardening missing');
+          if(!/revoke all on table public\.smartlink_cloud_state from anon, authenticated/i.test(migrationText))throw new Error('direct Data API deny contract missing');
+
           console.log('V6 contracts OK');
           NODE
+      - name: Secret hygiene guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE --exclude-dir=.git --exclude='*.md' --exclude='*.yml' --exclude='*.yaml' \
+            '(SUPABASE_SERVICE_ROLE_KEY|service_role["'"'=: ]|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|sk_live_[A-Za-z0-9])' .; then
+            echo 'Potential privileged secret found in repository.' >&2
+            exit 1
+          fi
+          echo 'No privileged secret patterns detected.'
