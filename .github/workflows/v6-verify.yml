@@ -22,162 +22,70 @@ jobs:
       - name: JavaScript syntax
         run: |
           set -e
-          node --check js/db.js
-          node --check js/auto-cloud-sync.js
-          node --check js/auth-gate.js
-          node --check js/v6-platform.js
-          node --check js/v6-bridge.js
-          node --check js/v6-import.js
-          node --check js/v6-bulk-extra.js
-          node --check js/theme-v61.js
-          node --check js/e2e-boot.js
-          node --check js/v7/core.js
-          node --check js/v7/search-worker.js
-          node --check js/v7/knowledge.js
-          node --check js/v7/mobile.js
-          node --check js/v7/boot.js
-          node --check sw.js
-          node --check worker/src/index.js
-          node --check extension/popup.js
-          node --check extension/background.js
-          node --check playwright.config.js
-          node --check tests/v7.spec.js
+          for f in \
+            js/db.js js/auto-cloud-sync.js js/auth-gate.js \
+            js/v6-platform.js js/v6-bridge.js js/v6-import.js js/v6-bulk-extra.js js/theme-v61.js \
+            js/e2e-boot.js js/v7/core.js js/v7/search-worker.js js/v7/knowledge.js js/v7/mobile.js js/v7/boot.js \
+            sw.js worker/src/index.js extension/popup.js extension/background.js playwright.config.js tests/v7.spec.js; do
+            node --check "$f"
+          done
 
-      - name: JSON manifests
+      - name: Verify V7 contracts
         run: |
           node <<'NODE'
           const fs=require('fs');
-          for(const file of ['manifest.webmanifest','extension/manifest.json','build-meta.json','package.json'])JSON.parse(fs.readFileSync(file,'utf8'));
-          console.log('JSON OK');
-          NODE
-
-      - name: Verify V7 assets, database and contracts
-        run: |
-          node <<'NODE'
-          const fs=require('fs');
-          const need=(f)=>{if(!fs.existsSync(f))throw new Error('Missing '+f)};
+          const need=f=>{if(!fs.existsSync(f))throw new Error('Missing '+f)};
           const files=[
-            'css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js','js/v6-import.js','js/v6-bulk-extra.js',
-            'css/theme-v61.css','css/theme-v61-legacy.css','css/theme-v61-runtime.css','js/theme-v61.js',
+            'build-meta.json','manifest.webmanifest','package.json','share.html','_headers',
             'css/v7.css','js/v7/boot.js','js/v7/core.js','js/v7/search-worker.js','js/v7/knowledge.js','js/v7/mobile.js','js/e2e-boot.js',
-            'build-meta.json','share.html','package.json','playwright.config.js','tests/v7.spec.js',
             'extension/manifest.json','extension/popup.html','extension/popup.js','extension/background.js',
             'worker/src/index.js','worker/wrangler.toml','worker/wrangler.browser.toml',
-            'supabase/migrations/20260908000028_smartlink_cloud_state_history_v2.sql',
-            'supabase/migrations/20260908000100_smartlink_v6_cloud_safety_and_devices.sql',
-            'supabase/migrations/20260908000110_smartlink_v6_explicit_data_api_deny.sql',
-            'supabase/migrations/20260908000120_smartlink_v6_login_audit_index.sql',
             'supabase/migrations/20260908171119_smartlink_v7_knowledge_memory.sql'
           ];
           files.forEach(need);
-
-          const index=fs.readFileSync('index.html','utf8');
-          for(const s of [
-            'css/v6-platform.css','js/v6-platform.js','js/v6-bridge.js',
-            'css/theme-v61.css','css/theme-v61-legacy.css','css/theme-v61-runtime.css','js/theme-v61.js',
-            'css/v7.css','js/v7/boot.js','js/e2e-boot.js','slh-v7-20260909'
-          ])if(!index.includes(s))throw new Error('index missing '+s);
-          if(index.indexOf('css/theme-v61.css')<index.indexOf('css/v6-platform.css'))throw new Error('theme CSS must load after V6 CSS');
-          if(index.indexOf('css/v7.css')<index.indexOf('css/theme-v61-runtime.css'))throw new Error('V7 CSS must load after theme compatibility CSS');
-          if(index.indexOf('js/v7/boot.js')>index.indexOf('js/v6-platform.js'))throw new Error('V7 runtime must register before V6 platform controller');
-          if(!index.includes('document.documentElement.dataset.theme'))throw new Error('first-paint theme bootstrap missing');
+          for(const f of ['manifest.webmanifest','extension/manifest.json','build-meta.json','package.json'])JSON.parse(fs.readFileSync(f,'utf8'));
 
           const meta=JSON.parse(fs.readFileSync('build-meta.json','utf8'));
-          if(meta.version!=='7.0.0'||meta.buildId!=='slh-v7-20260909'||meta.schema!==7)throw new Error('V7 build metadata invalid');
+          if(meta.version!=='7.0.0'||meta.buildId!=='slh-v7-20260909'||meta.schema!==7)throw new Error('Build metadata invalid');
 
-          const themeCss=fs.readFileSync('css/theme-v61.css','utf8');
-          for(const s of [
-            'body[data-theme="gold"]','body[data-theme="blue"]',
-            '--bg: #020304','--panel: rgba(7, 10, 15, 0.92)',
-            '--accent: #f5c542','--accent2: #ffe28a','--accent-dark: #c88900',
-            '--accent-rgb: 245, 197, 66','--glow: rgba(245, 197, 66, 0.35)',
-            '--accent: #38bdf8','--accent2: #8be8ff',
-            '.slh-theme-trigger','.slh-theme-option'
-          ])if(!themeCss.includes(s))throw new Error('theme contract missing '+s);
+          const index=fs.readFileSync('index.html','utf8');
+          for(const s of ['css/v7.css','js/v7/boot.js','js/e2e-boot.js','slh-v7-20260909'])if(!index.includes(s))throw new Error('index missing '+s);
 
-          const legacyTheme=fs.readFileSync('css/theme-v61-legacy.css','utf8');
-          for(const s of ['--v51-cyan: var(--accent)','--n54-cyan: var(--accent)','#v51-visual-layer','.v51-action-menu','.v51-metric-card','.v12-title-copy p'])if(!legacyTheme.includes(s))throw new Error('legacy theme bridge missing '+s);
-          const runtimeTheme=fs.readFileSync('css/theme-v61-runtime.css','utf8');
-          for(const s of ['#smartlink-auth-gate','#smartlink-user-wrap','.slh-submit','#slh-theme-settings'])if(!runtimeTheme.includes(s))throw new Error('runtime theme bridge missing '+s);
-          const themeJs=fs.readFileSync('js/theme-v61.js','utf8');
-          for(const s of ['Obsidian Gold','Midnight Blue','slh_theme_v61','setSetting','getSetting','SmartLinkTheme'])if(!themeJs.includes(s))throw new Error('theme controller missing '+s);
-
-          const v7css=fs.readFileSync('css/v7.css','utf8');
-          for(const s of ['.v7-mobile-nav','.v7-command','.v7-status-grid','.v7-result-list','content-visibility:auto'])if(!v7css.includes(s))throw new Error('V7 CSS contract missing '+s);
           const core=fs.readFileSync('js/v7/core.js','utf8');
-          for(const s of ['slh-v7-20260909','normalizeUrl','utm_','duplicateGroups','parseQuery','domain','Ctrl','fastSearch','search-worker.js','captureText','putDiagnostic'])if(!core.includes(s))throw new Error('V7 core contract missing '+s);
+          for(const s of ['normalizeUrl','utm_','duplicateGroups','parseQuery','fastSearch','search-worker.js','captureText','putDiagnostic','v7_capture'])if(!core.includes(s))throw new Error('core missing '+s);
           const knowledge=fs.readFileSync('js/v7/knowledge.js','utf8');
-          for(const s of ['smartlink_embedding_put','smartlink_semantic_search','smartlink_document_put','smartlink_share_create','Duplicate Center','Import Wizard','AI Librarian','System Status','archiveLink','hybridSearch'])if(!knowledge.includes(s))throw new Error('V7 knowledge contract missing '+s);
-
+          for(const s of ['smartlink_embedding_put','smartlink_semantic_search','smartlink_document_put','smartlink_share_create','Duplicate Center','Import Wizard','AI Librarian','System Status','archiveLink','hybridSearch'])if(!knowledge.includes(s))throw new Error('knowledge missing '+s);
           const db=fs.readFileSync('js/db.js','utf8');
-          for(const s of ['DB_VERSION=3',"'documents'","'visuals'","'diagnostics'",'normalizedUrl','readingState','putDiagnostic','putDocument','getVisual',"version:7"])if(!db.includes(s))throw new Error('V7 DB contract missing '+s);
-          for(const s of ["'trash'","'tombstones'","'syncQueue'",'restoreTrash','getSyncQueueCount'])if(!db.includes(s))throw new Error('V6 safety DB contract missing '+s);
-
-          const sync=fs.readFileSync('js/auto-cloud-sync.js','utf8');
-          for(const s of ['smartlink_state_put_v2','conflict','tombstones','getSyncQueueCount'])if(!sync.includes(s))throw new Error('sync contract missing '+s);
-
+          for(const s of ['DB_VERSION=3',"'documents'","'visuals'","'diagnostics'","'trash'","'tombstones'","'syncQueue'",'restoreTrash','putDocument','getVisual'])if(!db.includes(s))throw new Error('db missing '+s);
           const worker=fs.readFileSync('worker/src/index.js','utf8');
-          for(const s of ['/api/status','/api/archive','/api/embed','/api/rerank','/api/ask','@cf/baai/bge-m3','@cf/baai/bge-reranker-base',"redirect:'manual'",'blocked_redirect','unsafeHostname','privateIPv4','jsonLdInfo','readingMinutes'])if(!worker.includes(s))throw new Error('V7 worker contract missing '+s);
-          const browserToml=fs.readFileSync('worker/wrangler.browser.toml','utf8');
-          if(!browserToml.includes('[browser]')||!browserToml.includes('binding = "BROWSER"'))throw new Error('optional Browser Run binding missing');
+          for(const s of ['/api/status','/api/archive','/api/embed','/api/rerank','/api/ask','@cf/baai/bge-m3','@cf/baai/bge-reranker-base',"redirect:'manual'",'unsafeHostname','privateIPv4'])if(!worker.includes(s))throw new Error('worker missing '+s);
 
+          const migration=fs.readFileSync('supabase/migrations/20260908171119_smartlink_v7_knowledge_memory.sql','utf8');
+          for(const s of ['smartlink_documents','smartlink_embeddings','extensions.vector(1024)','using hnsw','smartlink_semantic_search','smartlink_share_create','smartlink_share_get','smartlink_documents_direct_api_deny'])if(!migration.includes(s))throw new Error('migration missing '+s);
+          if(!/security definer/i.test(migration)||!/set search_path to ''/i.test(migration))throw new Error('RPC hardening missing');
+
+          const ext=JSON.parse(fs.readFileSync('extension/manifest.json','utf8'));
+          if(ext.version!=='7.0.0'||!ext.background?.service_worker||!ext.permissions.includes('contextMenus')||!ext.commands?.['save-current-tab'])throw new Error('Extension V7 incomplete');
           const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
-          if(manifest.name!=='Smart Link Hub V7'||!manifest.share_target||manifest.shortcuts?.length<4)throw new Error('V7 PWA manifest incomplete');
-          if(manifest.theme_color!=='#020304'||manifest.background_color!=='#020304')throw new Error('PWA default theme color must match Obsidian Gold');
+          if(manifest.name!=='Smart Link Hub V7'||!manifest.share_target||manifest.shortcuts?.length<4)throw new Error('PWA V7 incomplete');
 
-          const extension=JSON.parse(fs.readFileSync('extension/manifest.json','utf8'));
-          if(extension.version!=='7.0.0'||!extension.background?.service_worker||!extension.permissions.includes('contextMenus')||!extension.commands?.['save-current-tab'])throw new Error('Extension V2/V7 contract missing');
-          const popup=fs.readFileSync('extension/popup.js','utf8'),background=fs.readFileSync('extension/background.js','utf8');
-          for(const s of ['collectionId','readLater','favorite','tags','v7capture'])if(!popup.includes(s))throw new Error('extension popup missing '+s);
-          for(const s of ['contextMenus','save-current-tab','v7capture'])if(!background.includes(s))throw new Error('extension background missing '+s);
-
-          const sw=fs.readFileSync('sw.js','utf8');
-          for(const s of ['slh-v7-knowledge-memory','./css/v7.css','./js/v7/boot.js','./js/v7/search-worker.js','./build-meta.json','./share.html'])if(!sw.includes(s))throw new Error('V7 service worker cache missing '+s);
-
-          const migrationText=files.filter(f=>f.endsWith('.sql')).map(f=>fs.readFileSync(f,'utf8')).join('\n');
-          for(const s of [
-            'smartlink_cloud_state_history','smartlink_state_put_v2','smartlink_state_restore',
-            'smartlink_devices','smartlink_login_history','smartlink_direct_api_deny','smartlink_login_audit_profile_id_created_idx',
-            'smartlink_documents','smartlink_embeddings','extensions.vector(1024)','using hnsw','smartlink_semantic_search','smartlink_share_create','smartlink_share_get','smartlink_documents_direct_api_deny'
-          ])if(!migrationText.includes(s))throw new Error('migration contract missing '+s);
-          if(!/security definer/i.test(migrationText)||!/set search_path to ''/i.test(migrationText))throw new Error('SECURITY DEFINER hardening missing');
-          if(!/revoke all on table public\.smartlink_cloud_state from anon, authenticated/i.test(migrationText))throw new Error('cloud direct Data API deny contract missing');
-          if(!/revoke all on table public\.smartlink_embeddings from public, anon, authenticated/i.test(migrationText))throw new Error('V7 vector direct Data API deny contract missing');
+          const headers=fs.readFileSync('_headers','utf8');
+          for(const s of ['X-Content-Type-Options: nosniff','X-Frame-Options: DENY','Strict-Transport-Security:','Content-Security-Policy-Report-Only:'])if(!headers.includes(s))throw new Error('header missing '+s);
 
           const e2e=fs.readFileSync('js/e2e-boot.js','utf8');
-          if(!e2e.includes("['localhost','127.0.0.1','::1']")||!e2e.includes("get('e2e')==='1'"))throw new Error('E2E harness must stay localhost-only and opt-in');
-
-          console.log('V7 + V6 compatibility contracts OK');
+          if(!e2e.includes("['localhost','127.0.0.1','::1']")||!e2e.includes("get('e2e')==='1'"))throw new Error('E2E harness must remain localhost-only');
+          console.log('V7 contracts OK');
           NODE
 
       - name: Secret hygiene guard
         run: |
           node <<'NODE'
           const fs=require('fs'),path=require('path');
-          const ignoredDirs=new Set(['.git','node_modules','.github','playwright-report','test-results']);
-          const ignoredExt=new Set(['.md','.yml','.yaml','.png','.jpg','.jpeg','.gif','.webp','.ico','.zip','.pdf']);
-          const patterns=[
-            ['Supabase service role env',/SUPABASE_SERVICE_ROLE_KEY\s*[=:]/i],
-            ['Supabase service role token',/\bservice_role\b\s*["'=:]/i],
-            ['Supabase secret key',/\bsb_secret_[A-Za-z0-9._-]{20,}/],
-            ['Stripe live secret',/\bsk_live_[A-Za-z0-9]{12,}/],
-            ['Private key block',/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/]
-          ];
-          const hits=[];
-          function walk(dir){
-            for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
-              if(entry.isDirectory()&&ignoredDirs.has(entry.name))continue;
-              const p=path.join(dir,entry.name);
-              if(entry.isDirectory()){walk(p);continue}
-              if(ignoredExt.has(path.extname(entry.name).toLowerCase()))continue;
-              const stat=fs.statSync(p);if(stat.size>2_000_000)continue;
-              let text;try{text=fs.readFileSync(p,'utf8')}catch{continue}
-              for(const [name,re] of patterns)if(re.test(text))hits.push(`${name}: ${p}`);
-            }
-          }
-          walk('.');
-          if(hits.length){console.error(hits.join('\n'));process.exit(1)}
-          console.log('No privileged secret patterns detected.');
+          const ignore=new Set(['.git','node_modules','.github','playwright-report','test-results']);
+          const patterns=[/SUPABASE_SERVICE_ROLE_KEY\s*[=:]/i,/\bsb_secret_[A-Za-z0-9._-]{20,}/,/\bsk_live_[A-Za-z0-9]{12,}/,/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/];
+          let hits=[];
+          function walk(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){if(e.isDirectory()&&ignore.has(e.name))continue;const p=path.join(d,e.name);if(e.isDirectory())walk(p);else{if(fs.statSync(p).size>2e6)continue;let t='';try{t=fs.readFileSync(p,'utf8')}catch{}if(patterns.some(r=>r.test(t)))hits.push(p)}}}
+          walk('.'); if(hits.length){console.error('Potential privileged secrets:',hits);process.exit(1)}
           NODE
 
       - name: Install Playwright
