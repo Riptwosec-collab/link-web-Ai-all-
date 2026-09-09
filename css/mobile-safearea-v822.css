@@ -1,0 +1,23 @@
+/* Mobile safe-area fill for Smart Link Hub */
+@media(max-width:767px){
+  html,body,#app{background:#05070d!important}
+  .v7-mobile-nav{
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    min-height:calc(68px + env(safe-area-inset-bottom))!important;
+    padding:4px 8px max(8px,env(safe-area-inset-bottom))!important;
+    border-radius:20px 20px 0 0!important;
+    border-left:0!important;
+    border-right:0!important;
+    border-bottom:0!important;
+    background:#05070d!important;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    box-shadow:0 -14px 38px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.055)!important;
+  }
+  .slh-v7-ready #dynamic-content{padding-bottom:calc(104px + env(safe-area-inset-bottom))!important}
+  .v7-toast{bottom:calc(84px + env(safe-area-inset-bottom))!important}
+}
