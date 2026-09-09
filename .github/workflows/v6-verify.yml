@@ -12,7 +12,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,62 +23,78 @@ jobs:
         run: |
           set -e
           for f in \
-            js/db.js js/auto-cloud-sync.js js/auto-cloud-ui.js js/nav-hotfix-v79.js js/auth-gate.js \
+            js/db.js js/cloud-links.js js/v8-data-center.js js/v8-ui-patch.js js/auto-cloud-sync.js js/auto-cloud-ui.js js/nav-hotfix-v79.js js/auth-gate.js \
             js/v6-platform.js js/v6-bridge.js js/v6-import.js js/v6-bulk-extra.js js/theme-v61.js \
-            js/e2e-boot.js js/v7/core.js js/v7/search-worker.js js/v7/knowledge.js js/v7/mobile.js js/v7/boot.js \
+            js/e2e-boot.js js/v7/core.js js/v7/search-worker.js js/v7/knowledge.js js/v7/mobile.js js/v7/boot.js js/v7/quick-capture.js \
             sw.js worker/src/index.js extension/popup.js extension/background.js playwright.config.js tests/v7.spec.js; do
             node --check "$f"
           done
 
-      - name: Verify V7 contracts
+      - name: Verify V7 + Data V8 contracts
         run: |
           node <<'NODE'
           const fs=require('fs');
           const need=f=>{if(!fs.existsSync(f))throw new Error('Missing '+f)};
+          const v8Migration='supabase/migrations/20260910013000_smartlink_v8_cloud_links.sql';
           const files=[
-            'build-meta.json','manifest.webmanifest','package.json','share.html','_headers',
-            'css/v7.css','js/v7/boot.js','js/v7/core.js','js/v7/search-worker.js','js/v7/knowledge.js','js/v7/mobile.js','js/e2e-boot.js','js/auto-cloud-ui.js','js/nav-hotfix-v79.js',
+            'build-meta.json','manifest.webmanifest','package.json','share.html','_headers','css/v7.css','css/data-v8.css',
+            'js/v7/boot.js','js/v7/core.js','js/v7/search-worker.js','js/v7/knowledge.js','js/v7/mobile.js','js/v7/quick-capture.js','js/e2e-boot.js',
+            'js/db.js','js/cloud-links.js','js/v8-data-center.js','js/v8-ui-patch.js','js/auto-cloud-sync.js','js/auto-cloud-ui.js','js/nav-hotfix-v79.js',
             'extension/manifest.json','extension/popup.html','extension/popup.js','extension/background.js',
             'worker/src/index.js','worker/wrangler.toml','worker/wrangler.browser.toml',
-            'supabase/migrations/20260908171119_smartlink_v7_knowledge_memory.sql'
+            'supabase/migrations/20260908171119_smartlink_v7_knowledge_memory.sql',v8Migration
           ];
           files.forEach(need);
           for(const f of ['manifest.webmanifest','extension/manifest.json','build-meta.json','package.json'])JSON.parse(fs.readFileSync(f,'utf8'));
 
           const meta=JSON.parse(fs.readFileSync('build-meta.json','utf8'));
-          if(meta.version!=='7.0.0'||meta.buildId!=='slh-v7-20260909'||meta.schema!==7)throw new Error('Build metadata invalid');
+          if(meta.version!=='7.0.0'||meta.buildId!=='slh-v7-20260909'||meta.schema!==7||meta.dataSchema!==8||meta.storageMode!=='supabase-row-v8')throw new Error('Build/data metadata invalid');
 
           const index=fs.readFileSync('index.html','utf8');
-          for(const s of ['css/v7.css','js/v7/boot.js','js/e2e-boot.js','slh-v7-20260909'])if(!index.includes(s))throw new Error('index missing '+s);
+          for(const s of ['css/v7.css','css/data-v8.css','js/v7/boot.js','js/e2e-boot.js','slh-v7-20260909','Cloud only','Supabase-only'])if(!index.includes(s))throw new Error('index missing '+s);
 
           const core=fs.readFileSync('js/v7/core.js','utf8');
           for(const s of ['normalizeUrl','utm_','duplicateGroups','parseQuery','fastSearch','search-worker.js','captureText','putDiagnostic','v7_capture'])if(!core.includes(s))throw new Error('core missing '+s);
           const knowledge=fs.readFileSync('js/v7/knowledge.js','utf8');
           for(const s of ['smartlink_embedding_put','smartlink_semantic_search','smartlink_document_put','smartlink_share_create','Duplicate Center','Import Wizard','AI Librarian','System Status','archiveLink','hybridSearch'])if(!knowledge.includes(s))throw new Error('knowledge missing '+s);
+
           const nav=fs.readFileSync('js/auto-cloud-ui.js','utf8');
           for(const s of ["['home','house','Home']","['library','squares-four','Library']","['ai','brain','AI Search']","['categories','tree-structure','Categories']","['favorites','star','Favorites']","['read-later','book-open-text','Read Later']","['settings','gear-six','Settings']",'slh-v710-nav','data-slh-route','SmartLinkNavigation','slh-library-views','slh-settings-tools','Duplicate Review','System Status & Diagnostics',"b.dataset.v7Mobile='categories'"])if(!nav.includes(s))throw new Error('authoritative navigation missing '+s);
           const hotfix=fs.readFileSync('js/nav-hotfix-v79.js','utf8');
           if(!hotfix.includes('retired:true')||/addEventListener\(['\"]click/.test(hotfix))throw new Error('old navigation hotfix must remain retired');
+
           const db=fs.readFileSync('js/db.js','utf8');
-          for(const s of ['DB_VERSION=4',"'documents'","'visuals'","'diagnostics'","'trash'","'tombstones'","'syncQueue'",'restoreTrash','putDocument','getVisual','cloud-only-links','VOLATILE_STORES'])if(!db.includes(s))throw new Error('db missing '+s);
+          for(const s of ['DB_VERSION=5',"deleteObjectStore(legacy)",'hydrateCloudLinks','createCloudLink','updateCloudLink','deleteCloudLink','restoreCloudLink','Mass link deletion is blocked','supabase-row-v8','getLinkHistory','createBackup','restoreBackup'])if(!db.includes(s))throw new Error('V8 db missing '+s);
+          if(/createObjectStore\(['\"]links['\"]/.test(db))throw new Error('Production IndexedDB must not create a links store');
+          if(/createObjectStore\(['\"]trash['\"]/.test(db)||/createObjectStore\(['\"]tombstones['\"]/.test(db))throw new Error('Trash/tombstones must not persist as local link stores');
+
+          const cloud=fs.readFileSync('js/cloud-links.js','utf8');
+          for(const s of ['smartlink_links_list','smartlink_link_create','smartlink_link_update','smartlink_link_delete','smartlink_link_restore','smartlink_link_history_list','smartlink_backup_create','smartlink_backup_preview','smartlink_backup_restore','p_request_id','Saved to Supabase'])if(!cloud.includes(s))throw new Error('V8 cloud client missing '+s);
+          const data=fs.readFileSync('js/v8-data-center.js','utf8');
+          for(const s of ['Cloud & Data Center','Backups & Restore','Version History','Persistent browser links','Restore preview'])if(!data.includes(s))throw new Error('Data Center missing '+s);
+          const capture=fs.readFileSync('js/v7/quick-capture.js','utf8');
+          for(const s of ['CLOUD ONLY','Writing directly to Supabase','Saved to Supabase','Nothing is stored locally'])if(!capture.includes(s))throw new Error('Quick Capture cloud-only UX missing '+s);
+
           const worker=fs.readFileSync('worker/src/index.js','utf8');
           for(const s of ['/api/status','/api/archive','/api/embed','/api/rerank','/api/ask','@cf/baai/bge-m3','@cf/baai/bge-reranker-base',"redirect:'manual'",'unsafeHostname','privateIPv4'])if(!worker.includes(s))throw new Error('worker missing '+s);
 
-          const migration=fs.readFileSync('supabase/migrations/20260908171119_smartlink_v7_knowledge_memory.sql','utf8');
-          for(const s of ['smartlink_documents','smartlink_embeddings','extensions.vector(1024)','using hnsw','smartlink_semantic_search','smartlink_share_create','smartlink_share_get','smartlink_documents_direct_api_deny'])if(!migration.includes(s))throw new Error('migration missing '+s);
-          if(!/security definer/i.test(migration)||!/set search_path to ''/i.test(migration))throw new Error('RPC hardening missing');
+          const v7Migration=fs.readFileSync('supabase/migrations/20260908171119_smartlink_v7_knowledge_memory.sql','utf8');
+          for(const s of ['smartlink_documents','smartlink_embeddings','extensions.vector(1024)','using hnsw','smartlink_semantic_search','smartlink_share_create','smartlink_share_get','smartlink_documents_direct_api_deny'])if(!v7Migration.includes(s))throw new Error('V7 migration missing '+s);
+          if(!/security definer/i.test(v7Migration)||!/set search_path to ''/i.test(v7Migration))throw new Error('V7 RPC hardening missing');
+
+          const m=fs.readFileSync(v8Migration,'utf8');
+          for(const s of ['smartlink_links','smartlink_link_history','smartlink_backups','unique(profile_id,normalized_url)','smartlink_link_create','smartlink_link_update','smartlink_link_delete','smartlink_link_restore','smartlink_backup_preview','smartlink_backup_restore','_smartlink_ensure_backups','security definer','set search_path to \'\''])if(!m.includes(s))throw new Error('V8 migration missing '+s);
 
           const ext=JSON.parse(fs.readFileSync('extension/manifest.json','utf8'));
           if(ext.version!=='7.0.0'||!ext.background?.service_worker||!ext.permissions.includes('contextMenus')||!ext.commands?.['save-current-tab'])throw new Error('Extension V7 incomplete');
           const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
-          if(manifest.name!=='Smart Link Hub V7'||!manifest.share_target||manifest.shortcuts?.length<4)throw new Error('PWA V7 incomplete');
+          if(manifest.name!=='Smart Link Hub V7'||!manifest.share_target||manifest.shortcuts?.length<4||!/Supabase-only/i.test(manifest.description))throw new Error('PWA V7/V8 data contract incomplete');
 
           const headers=fs.readFileSync('_headers','utf8');
           for(const s of ['X-Content-Type-Options: nosniff','X-Frame-Options: DENY','Strict-Transport-Security:','Content-Security-Policy-Report-Only:'])if(!headers.includes(s))throw new Error('header missing '+s);
-
           const e2e=fs.readFileSync('js/e2e-boot.js','utf8');
           if(!e2e.includes("['localhost','127.0.0.1','::1']")||!e2e.includes("get('e2e')==='1'"))throw new Error('E2E harness must remain localhost-only');
-          console.log('V7 contracts OK');
+          console.log('V7 UI + V8 data contracts OK');
           NODE
 
       - name: Secret hygiene guard
@@ -89,7 +105,7 @@ jobs:
           const patterns=[/SUPABASE_SERVICE_ROLE_KEY\s*[=:]/i,/\bsb_secret_[A-Za-z0-9._-]{20,}/,/\bsk_live_[A-Za-z0-9]{12,}/,/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/];
           let hits=[];
           function walk(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){if(e.isDirectory()&&ignore.has(e.name))continue;const p=path.join(d,e.name);if(e.isDirectory())walk(p);else{if(fs.statSync(p).size>2e6)continue;let t='';try{t=fs.readFileSync(p,'utf8')}catch{}if(patterns.some(r=>r.test(t)))hits.push(p)}}}
-          walk('.'); if(hits.length){console.error('Potential privileged secrets:',hits);process.exit(1)}
+          walk('.');if(hits.length){console.error('Potential privileged secrets:',hits);process.exit(1)}
           NODE
 
       - name: Install Playwright
