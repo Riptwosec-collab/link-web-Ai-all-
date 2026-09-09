@@ -7,6 +7,7 @@ let lastSignature='';
 let eventBusy=false;
 let renderTimer=null;
 let channel=null;
+let syncButtonTimer=null;
 
 const token=()=>{try{return localStorage.getItem('smartlink_session_token')||''}catch{return ''}};
 const liveRows=rows=>(Array.isArray(rows)?rows:[]).filter(x=>!x?.deletedAt);
@@ -15,20 +16,100 @@ function installStyles(){
   if(document.getElementById('slh-v82-runtime-style'))return;
   const s=document.createElement('style');
   s.id='slh-v82-runtime-style';
-  s.textContent=`#v81-live-pill{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 9px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.035);font:600 9px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#94a3b8;white-space:nowrap}#v81-live-pill:before{content:'';width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399}#v81-live-pill[data-mode="offline"]:before,#v81-live-pill[data-mode="error"]:before{background:#fb7185;box-shadow:0 0 10px #fb7185}#v81-live-pill[data-mode="syncing"]:before{background:#fbbf24;box-shadow:0 0 10px #fbbf24}`;
+  s.textContent=`
+#v81-live-pill{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 9px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.035);font:600 9px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#94a3b8;white-space:nowrap}
+#v81-live-pill:before{content:'';width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399}
+#v81-live-pill[data-mode="offline"]:before,#v81-live-pill[data-mode="error"]:before{background:#fb7185;box-shadow:0 0 10px #fb7185}
+#v81-live-pill[data-mode="syncing"]:before{background:#fbbf24;box-shadow:0 0 10px #fbbf24}
+#v82-refresh-btn{position:relative;overflow:visible}
+#v82-refresh-btn i{transition:transform .25s ease}
+#v82-refresh-btn.syncing i{animation:v82-spin .72s linear infinite}
+#v82-refresh-btn.synced{color:#6ee7b7;border-color:rgba(52,211,153,.28);background:rgba(52,211,153,.07)}
+#v82-refresh-btn.error{color:#fda4af;border-color:rgba(251,113,133,.28);background:rgba(251,113,133,.07)}
+#v82-refresh-btn .v82-sync-label{display:none}
+#v82-refresh-btn[data-sync-state="syncing"]:after,#v82-refresh-btn[data-sync-state="synced"]:after,#v82-refresh-btn[data-sync-state="error"]:after{content:attr(data-sync-label);position:absolute;top:calc(100% + 7px);right:0;z-index:1000;padding:6px 8px;border:1px solid rgba(255,255,255,.08);border-radius:9px;background:rgba(8,10,15,.96);box-shadow:0 12px 32px rgba(0,0,0,.36);color:#cbd5e1;font:600 9px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;white-space:nowrap;pointer-events:none}
+@keyframes v82-spin{to{transform:rotate(360deg)}}
+@media(max-width:767px){#v82-refresh-btn{width:42px;height:42px;min-width:42px;border-radius:13px}#v81-live-pill{display:none}header.topbar{padding-left:12px!important;padding-right:12px!important}.v5-header-left{min-width:0!important;flex:1 1 auto!important}.v5-header-left>div:last-child{min-width:0}#page-title{max-width:110px}}
+@media(max-width:390px){#command-btn,#install-btn{display:none!important}#v82-refresh-btn,#add-link-btn{width:40px;height:40px;min-width:40px}.topbar{gap:6px!important}}
+`;
   document.head.appendChild(s);
 }
 
 function ensureLivePill(){
   let p=document.getElementById('v81-live-pill');
   if(p)return p;
-  const host=document.querySelector('header .flex.items-center.gap-2');
+  const host=document.querySelector('header .flex.items-center.gap-2.shrink-0')||document.querySelector('header .flex.items-center.gap-2');
   if(!host)return null;
   p=document.createElement('span');p.id='v81-live-pill';host.prepend(p);return p;
 }
 function liveStatus(mode='live',text='Live'){
   const p=ensureLivePill();if(!p)return;
   p.dataset.mode=mode;p.textContent=text;
+}
+
+function setRefreshState(state='idle',label=''){
+  const b=document.getElementById('v82-refresh-btn');if(!b)return;
+  clearTimeout(syncButtonTimer);
+  b.classList.remove('syncing','synced','error');
+  b.disabled=state==='syncing';
+  b.dataset.syncState=state==='idle'?'':state;
+  b.dataset.syncLabel=label||'';
+  if(state==='syncing')b.classList.add('syncing');
+  if(state==='synced')b.classList.add('synced');
+  if(state==='error')b.classList.add('error');
+  b.setAttribute('aria-label',state==='syncing'?'Syncing cloud data':state==='synced'?'Cloud sync complete':state==='error'?'Cloud sync failed':'Refresh and sync cloud');
+  b.title=state==='syncing'?'Syncing Supabase Cloud…':state==='synced'?'Cloud sync complete':state==='error'?'Cloud sync failed — tap to retry':'Refresh from Supabase Cloud';
+  if(state==='synced'||state==='error')syncButtonTimer=setTimeout(()=>setRefreshState('idle'),1800);
+}
+
+async function manualSync(){
+  if(!token()){
+    liveStatus('offline','Locked');
+    setRefreshState('error','Login required');
+    return false;
+  }
+  if(!navigator.onLine){
+    liveStatus('offline','Offline');
+    setRefreshState('error','Offline');
+    return false;
+  }
+  setRefreshState('syncing','Syncing…');
+  liveStatus('syncing','Syncing');
+  const linksOk=await syncNow({forceRender:true,quiet:false});
+  let settingsOk=true;
+  try{
+    const fn=window.SmartLinkCloudSyncV82?.syncSettings;
+    if(typeof fn==='function')settingsOk=await fn({showStatus:false});
+    else window.dispatchEvent(new CustomEvent('smartlink:cloud-force-sync',{detail:{manual:true}}));
+  }catch{settingsOk=false}
+  const ok=Boolean(linksOk&&settingsOk!==false);
+  if(ok){
+    liveStatus('live','Synced');
+    setRefreshState('synced','Synced from Cloud');
+    announceChange();
+    setTimeout(()=>liveStatus('live','Live'),1600);
+  }else{
+    liveStatus(navigator.onLine?'error':'offline',navigator.onLine?'Sync error':'Offline');
+    setRefreshState('error','Sync failed');
+  }
+  return ok;
+}
+
+function ensureRefreshButton(){
+  let b=document.getElementById('v82-refresh-btn');if(b)return b;
+  const host=document.querySelector('header .flex.items-center.gap-2.shrink-0');
+  if(!host)return null;
+  b=document.createElement('button');
+  b.type='button';
+  b.id='v82-refresh-btn';
+  b.className='icon-btn';
+  b.title='Refresh from Supabase Cloud';
+  b.setAttribute('aria-label','Refresh and sync cloud');
+  b.innerHTML='<i class="ph ph-arrows-clockwise"></i><span class="v82-sync-label">Sync</span>';
+  b.addEventListener('click',()=>void manualSync());
+  const add=document.getElementById('add-link-btn');
+  if(add?.parentElement===host)host.insertBefore(b,add);else host.appendChild(b);
+  return b;
 }
 
 function signature(rows=[]){
@@ -148,9 +229,12 @@ function bindCloudEvents(){
     eventBusy=true;
     queueMicrotask(async()=>{try{await updateSidebar()}catch{}finally{eventBusy=false}});
   });
+  window.addEventListener('smartlink:manual-cloud-refresh',()=>void manualSync());
   window.addEventListener('online',()=>{liveStatus('syncing','Syncing');void syncNow({forceRender:true})},{passive:true});
   window.addEventListener('offline',()=>liveStatus('offline','Offline'),{passive:true});
-  window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void syncNow({quiet:true})});
+  window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void syncNow({forceRender:false,quiet:true})});
+  window.addEventListener('focus',()=>void syncNow({forceRender:false,quiet:true}),{passive:true});
+  window.addEventListener('pageshow',()=>void syncNow({forceRender:false,quiet:true}),{passive:true});
 }
 
 async function quickIntegrity(){
@@ -163,11 +247,11 @@ async function quickIntegrity(){
 }
 
 export function initRuntimeFixV82(){
-  installStyles();ensureLivePill();liveStatus(navigator.onLine?'live':'offline',navigator.onLine?'Live':'Offline');
+  installStyles();ensureLivePill();ensureRefreshButton();liveStatus(navigator.onLine?'live':'offline',navigator.onLine?'Live':'Offline');
   setupRealtime();bindCloudEvents();startPolling();
   if(token())setTimeout(()=>void syncNow({forceRender:true}),250);
   setTimeout(()=>void quickIntegrity(),1800);
-  const api={poll:syncNow,syncNow,updateSidebar,refreshCurrent,integrity:quickIntegrity,version:'8.2-runtime-fix'};
+  const api={poll:syncNow,syncNow,manualSync,updateSidebar,refreshCurrent,integrity:quickIntegrity,version:'8.2.1-mobile-sync'};
   window.SmartLinkV82=api;
   window.SmartLinkV81=api;
 }
