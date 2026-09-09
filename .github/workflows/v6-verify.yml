@@ -60,7 +60,7 @@ jobs:
           const hotfix=fs.readFileSync('js/nav-hotfix-v79.js','utf8');
           if(!hotfix.includes('retired:true')||/addEventListener\(['\"]click/.test(hotfix))throw new Error('old navigation hotfix must remain retired');
           const db=fs.readFileSync('js/db.js','utf8');
-          for(const s of ['DB_VERSION=3',"'documents'","'visuals'","'diagnostics'","'trash'","'tombstones'","'syncQueue'",'restoreTrash','putDocument','getVisual'])if(!db.includes(s))throw new Error('db missing '+s);
+          for(const s of ['DB_VERSION=4',"'documents'","'visuals'","'diagnostics'","'trash'","'tombstones'","'syncQueue'",'restoreTrash','putDocument','getVisual','cloud-only-links','VOLATILE_STORES'])if(!db.includes(s))throw new Error('db missing '+s);
           const worker=fs.readFileSync('worker/src/index.js','utf8');
           for(const s of ['/api/status','/api/archive','/api/embed','/api/rerank','/api/ask','@cf/baai/bge-m3','@cf/baai/bge-reranker-base',"redirect:'manual'",'unsafeHostname','privateIPv4'])if(!worker.includes(s))throw new Error('worker missing '+s);
 
