@@ -95,7 +95,7 @@ jobs:
       - name: Install Playwright
         run: |
           npm install --no-audit --no-fund
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
 
       - name: Browser E2E
         run: npm run test:e2e
