@@ -1,8 +1,8 @@
 {
   "id":"/",
-  "name":"Smart Link Hub V7",
+  "name":"Smart Link Hub V8.1",
   "short_name":"Link Hub",
-  "description":"Personal Web Memory with V8 Supabase-only link storage, server-confirmed saves, semantic AI search, full-text archive, version history and safe cloud backups.",
+  "description":"Personal Web Memory with Supabase-only server-confirmed link storage, live multi-device sync, conflict protection, verified backups, semantic AI search and recovery tooling.",
   "start_url":"/",
   "scope":"/",
   "display":"standalone",
@@ -16,10 +16,10 @@
   "icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}],
   "shortcuts":[
     {"name":"Add Link","short_name":"Add","description":"Save a new web link directly to Supabase","url":"/?v6=add","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
-    {"name":"Semantic AI","short_name":"AI Search","description":"Search your saved library by meaning","url":"/?v7=semantic","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
-    {"name":"Read Later","short_name":"Read Later","description":"Open your reading queue","url":"/?v6=read-later","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
+    {"name":"Semantic AI","short_name":"AI Search","description":"Search your saved cloud library by meaning","url":"/?v7=semantic","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
+    {"name":"Read Later","short_name":"Read Later","description":"Open your cloud reading queue","url":"/?v6=read-later","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
     {"name":"System Status","short_name":"Status","description":"Verify Cloud, Worker, PWA and build health","url":"/?v7=status","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]},
-    {"name":"Cloud & Data","short_name":"Backups","description":"Open Supabase history, backups and recovery","url":"/#settings","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]}
+    {"name":"Cloud & Data","short_name":"Backups","description":"Open integrity, backups, history, recovery and diagnostics","url":"/#settings","icons":[{"src":"icons/icon.svg","sizes":"any","type":"image/svg+xml"}]}
   ],
   "share_target":{"action":"/?share=1","method":"GET","enctype":"application/x-www-form-urlencoded","params":{"title":"title","text":"text","url":"url"}},
   "launch_handler":{"client_mode":["navigate-existing","auto"]},
