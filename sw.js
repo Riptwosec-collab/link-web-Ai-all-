@@ -1,9 +1,9 @@
-const CACHE='slh-v7.6-organization-intelligence';
+const CACHE='slh-v8-supabase-row-store';
 const CORE=[
   './','./index.html','./share.html','./build-meta.json',
-  './css/app.css','./css/performance-v51.css','./css/card-v12.css','./css/nav-v5.css','./css/premium-v51.css','./css/smooth-v52.css','./css/neo-v54.css','./css/v6-platform.css','./css/theme-v61.css','./css/theme-v61-legacy.css','./css/theme-v61-runtime.css','./css/v7.css','./css/organization-v76.css',
-  './js/e2e-boot.js','./js/app.js','./js/nav-v5.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v12.js','./js/auto-cloud-sync.js','./js/auto-cloud-ui.js','./js/smooth-v52.js','./js/interaction-v53.js','./js/analytics-v53.js','./js/neo-v54.js','./js/shortcuts-v51.js','./js/cloud.js','./js/v6-platform.js','./js/v6-bridge.js','./js/theme-v61.js',
-  './js/v7/boot.js','./js/v7/core.js','./js/v7/knowledge.js','./js/v7/mobile.js','./js/v7/search-worker.js','./js/v7/auto-category.js','./js/v7/organization.js',
+  './css/app.css','./css/performance-v51.css','./css/card-v12.css','./css/nav-v5.css','./css/premium-v51.css','./css/smooth-v52.css','./css/neo-v54.css','./css/v6-platform.css','./css/theme-v61.css','./css/theme-v61-legacy.css','./css/theme-v61-runtime.css','./css/v7.css','./css/organization-v76.css','./css/quick-capture-v76.css','./css/data-v8.css',
+  './js/e2e-boot.js','./js/app.js','./js/nav-v5.js','./js/instant-save-v9.js','./js/auth-gate.js','./js/db.js','./js/cloud-links.js','./js/v8-data-center.js','./js/v8-ui-patch.js','./js/search.js','./js/metadata.js','./js/metadata-v9.js','./js/metadata-repair.js','./js/card-v12.js','./js/auto-cloud-sync.js','./js/auto-cloud-ui.js','./js/smooth-v52.js','./js/interaction-v53.js','./js/analytics-v53.js','./js/neo-v54.js','./js/shortcuts-v51.js','./js/cloud.js','./js/v6-platform.js','./js/v6-bridge.js','./js/theme-v61.js',
+  './js/v7/boot.js','./js/v7/core.js','./js/v7/knowledge.js','./js/v7/mobile.js','./js/v7/search-worker.js','./js/v7/auto-category.js','./js/v7/organization.js','./js/v7/quick-capture.js',
   './manifest.webmanifest','./icons/icon.svg'
 ];
 
