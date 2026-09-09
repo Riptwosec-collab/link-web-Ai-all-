@@ -25,12 +25,15 @@ async function boot(){
     await load('auto-category','./auto-category.js','initAutoCategory');
     await load('organization','./organization.js','initOrganization');
     await load('quick-capture','./quick-capture.js','initQuickCapture');
+    await load('data-v8','../v8-data-center.js','initDataCenter');
     await load('mobile','./mobile.js','initMobile');
 
     document.documentElement.classList.add('slh-v7-ready');
+    document.documentElement.classList.add('slh-data-v8-ready');
     if(!BOOT_ERRORS.some(x=>['organization','quick-capture'].includes(x.stage)))document.documentElement.classList.add('slh-v76-ready');
     document.documentElement.dataset.slhBootErrors=String(BOOT_ERRORS.length);
-    window.dispatchEvent(new CustomEvent('smartlink:v7-ready',{detail:{build:core?.BUILD||window.__SLH_BUILD__||null,errors:[...BOOT_ERRORS]}}));
+    document.documentElement.dataset.slhStorage='supabase-row-v8';
+    window.dispatchEvent(new CustomEvent('smartlink:v7-ready',{detail:{build:core?.BUILD||window.__SLH_BUILD__||null,storage:'supabase-row-v8',errors:[...BOOT_ERRORS]}}));
 
     if(BOOT_ERRORS.length){
       const el=document.createElement('button');el.type='button';el.className='v7-boot-warning';el.title=BOOT_ERRORS.map(x=>`${x.stage}: ${x.message}`).join('\n');el.innerHTML=`<i class="ph ph-warning-circle"></i><span>${BOOT_ERRORS.length} module warning${BOOT_ERRORS.length===1?'':'s'}</span>`;el.onclick=()=>window.dispatchEvent(new CustomEvent('smartlink:v7-open',{detail:{page:'status'}}));document.body.appendChild(el);
