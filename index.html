@@ -4,43 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#020304" />
-  <meta name="slh-build" content="slh-v7-20260909" />
-  <meta name="description" content="Smart Link Hub V7 with V8 Supabase-only link storage, server-confirmed saves, semantic AI search, version history and safe cloud backups" />
+  <meta name="slh-build" content="slh-v81-20260910" />
+  <meta name="description" content="Smart Link Hub V8.1 with Supabase-only link storage, server-confirmed writes, live multi-device sync, conflict protection, verified backups and semantic AI search" />
   <meta name="application-name" content="Smart Link Hub" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="manifest.webmanifest?v=8" />
+  <link rel="manifest" href="manifest.webmanifest?v=8.1" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon.svg" />
-  <title>Smart Link Hub V7</title>
+  <title>Smart Link Hub V8.1</title>
   <script>
     (()=>{try{const t=localStorage.getItem('slh_theme_v61')||localStorage.getItem('smartlink_theme')||'gold';document.documentElement.dataset.theme=t==='blue'?'blue':'gold'}catch(_){document.documentElement.dataset.theme='gold'}})();
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.tailwindcss.com">
-  <link rel="preconnect" href="https://unpkg.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{dark:'#020304',panel:'#0a0e14',accent:'#f5c542',cyan:'#ffe28a',violet:'#c88900'}}}}}
-  </script>
-  <link rel="stylesheet" href="css/app.css?v=8" />
-  <link rel="stylesheet" href="css/performance-v51.css?v=8" />
-  <link rel="stylesheet" href="css/card-v12.css?v=8" />
-  <link rel="stylesheet" href="css/nav-v5.css?v=8" />
-  <link rel="stylesheet" href="css/premium-v51.css?v=8" />
-  <link rel="stylesheet" href="css/smooth-v52.css?v=8" />
-  <link rel="stylesheet" href="css/neo-v54.css?v=8" />
-  <link rel="stylesheet" href="css/v6-platform.css?v=8" />
-  <link rel="stylesheet" href="css/theme-v61.css?v=8" />
-  <link rel="stylesheet" href="css/theme-v61-legacy.css?v=8" />
-  <link rel="stylesheet" href="css/theme-v61-runtime.css?v=8" />
-  <link rel="stylesheet" href="css/v7.css?v=8" />
-  <link rel="stylesheet" href="css/organization-v76.css?v=8" />
-  <link rel="stylesheet" href="css/data-v8.css?v=8" />
+  <link rel="stylesheet" href="css/utility-v81.css?v=8.1" />
+  <link rel="stylesheet" href="css/icons-v81.css?v=8.1" />
+  <link rel="stylesheet" href="css/app.css?v=8.1" />
+  <link rel="stylesheet" href="css/performance-v51.css?v=8.1" />
+  <link rel="stylesheet" href="css/card-v12.css?v=8.1" />
+  <link rel="stylesheet" href="css/nav-v5.css?v=8.1" />
+  <link rel="stylesheet" href="css/premium-v51.css?v=8.1" />
+  <link rel="stylesheet" href="css/smooth-v52.css?v=8.1" />
+  <link rel="stylesheet" href="css/neo-v54.css?v=8.1" />
+  <link rel="stylesheet" href="css/v6-platform.css?v=8.1" />
+  <link rel="stylesheet" href="css/theme-v61.css?v=8.1" />
+  <link rel="stylesheet" href="css/theme-v61-legacy.css?v=8.1" />
+  <link rel="stylesheet" href="css/theme-v61-runtime.css?v=8.1" />
+  <link rel="stylesheet" href="css/v7.css?v=8.1" />
+  <link rel="stylesheet" href="css/organization-v76.css?v=8.1" />
+  <link rel="stylesheet" href="css/data-v8.css?v=8.1" />
 </head>
 <body class="h-[100dvh] overflow-hidden bg-brand-dark text-slate-200 antialiased">
   <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div><div class="noise"></div>
@@ -49,7 +41,7 @@
       <div class="px-5 pt-[max(20px,env(safe-area-inset-top))] pb-4">
         <button data-page="home" class="brand-button flex items-center gap-3 w-full text-left">
           <div class="brand-mark"><i class="ph-fill ph-link-simple text-white"></i></div>
-          <div><div class="font-semibold text-white tracking-tight">Smart Link Hub</div><div class="text-[9px] text-cyan-300/70 tracking-[.22em] uppercase">Personal Web Memory · Cloud V8</div></div>
+          <div><div class="font-semibold text-white tracking-tight">Smart Link Hub</div><div class="text-[9px] text-cyan-300/70 tracking-[.22em] uppercase">Personal Web Memory · Cloud V8.1</div></div>
         </button>
       </div>
       <nav id="sidebar-nav" class="px-3 flex-1 overflow-y-auto space-y-1">
@@ -79,11 +71,7 @@
           <div><div id="page-eyebrow" class="text-[9px] uppercase tracking-[.24em] text-cyan-300/60">Library</div><h1 id="page-title" class="text-sm font-semibold text-white truncate">Home</h1></div>
         </div>
         <div class="v5-header-center">
-          <label class="v5-global-search" for="global-search">
-            <i class="ph ph-magnifying-glass"></i>
-            <input id="global-search" type="search" placeholder="Search links, collections, tags…" autocomplete="off" spellcheck="false" />
-            <kbd>⌘K</kbd>
-          </label>
+          <label class="v5-global-search" for="global-search"><i class="ph ph-magnifying-glass"></i><input id="global-search" type="search" placeholder="Search title, URL, category, tags or meaning…" autocomplete="off" spellcheck="false" /><kbd>⌘K</kbd></label>
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <button id="command-btn" class="command-trigger hidden lg:flex"><i class="ph ph-command"></i><span>Command</span><kbd>⌘K</kbd></button>
@@ -98,24 +86,24 @@
   <div id="modal-root"></div><div id="toast-root" class="toast-root"></div>
   <div id="command-overlay" class="command-overlay hidden" aria-hidden="true"></div>
   <input id="import-file" type="file" accept=".json,.csv,.html,.htm" class="hidden" />
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
-  <script src="js/e2e-boot.js?v=8"></script>
-  <script src="js/auth-gate.js?v=8"></script>
-  <script type="module" src="js/v7/boot.js?v=8"></script>
-  <script type="module" src="js/app.js?v=8"></script>
-  <script type="module" src="js/nav-v5.js?v=8"></script>
-  <script type="module" src="js/instant-save-v9.js?v=8"></script>
-  <script type="module" src="js/metadata-repair.js?v=8"></script>
-  <script type="module" src="js/card-v12.js?v=8"></script>
-  <script type="module" src="js/auto-cloud-sync.js?v=8"></script>
-  <script src="js/auto-cloud-ui.js?v=8"></script>
-  <script src="js/smooth-v52.js?v=8"></script>
-  <script type="module" src="js/interaction-v53.js?v=8"></script>
-  <script type="module" src="js/analytics-v53.js?v=8"></script>
-  <script src="js/neo-v54.js?v=8"></script>
-  <script src="js/shortcuts-v51.js?v=8"></script>
-  <script type="module" src="js/v6-platform.js?v=8"></script>
-  <script src="js/v6-bridge.js?v=8"></script>
-  <script src="js/theme-v61.js?v=8"></script>
+  <script src="js/e2e-boot.js?v=8.1"></script>
+  <script src="js/auth-gate.js?v=8.1"></script>
+  <script src="js/auth-v81-patch.js?v=8.1"></script>
+  <script type="module" src="js/v7/boot.js?v=8.1"></script>
+  <script type="module" src="js/app.js?v=8.1"></script>
+  <script type="module" src="js/nav-v5.js?v=8.1"></script>
+  <script type="module" src="js/instant-save-v9.js?v=8.1"></script>
+  <script type="module" src="js/metadata-repair.js?v=8.1"></script>
+  <script type="module" src="js/card-v12.js?v=8.1"></script>
+  <script type="module" src="js/auto-cloud-sync.js?v=8.1"></script>
+  <script src="js/auto-cloud-ui.js?v=8.1"></script>
+  <script src="js/smooth-v52.js?v=8.1"></script>
+  <script type="module" src="js/interaction-v53.js?v=8.1"></script>
+  <script type="module" src="js/analytics-v53.js?v=8.1"></script>
+  <script src="js/neo-v54.js?v=8.1"></script>
+  <script src="js/shortcuts-v51.js?v=8.1"></script>
+  <script type="module" src="js/v6-platform.js?v=8.1"></script>
+  <script src="js/v6-bridge.js?v=8.1"></script>
+  <script src="js/theme-v61.js?v=8.1"></script>
 </body>
 </html>
