@@ -1,0 +1,42 @@
+/* Smart Link Hub V8.2 runtime repair layer */
+html,body{margin:0;min-width:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button,input,textarea,select{font:inherit}
+button{-webkit-appearance:none;appearance:none;background-color:transparent;background-image:none;border:0;color:inherit;margin:0}
+button:disabled{cursor:not-allowed}
+
+/* Tailwind Preflight used to reset native button chrome. Keep the seven primary items dark/glass instead of browser-default gray. */
+#sidebar-nav>.slh-v710-item{
+  background:rgba(255,255,255,.018);
+  border:1px solid rgba(255,255,255,.035);
+  color:#7f8794;
+  opacity:1;
+  pointer-events:auto;
+  -webkit-tap-highlight-color:transparent;
+}
+#sidebar-nav>.slh-v710-item:not(.active):hover{
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.075);
+  color:#e5e7eb;
+}
+#sidebar-nav>.slh-v710-item.active{
+  color:var(--accent,#f5c542);
+}
+#sidebar-nav>.slh-v710-item:disabled{
+  opacity:1;
+  pointer-events:auto;
+  cursor:pointer;
+}
+
+/* Cloud status must never look permanently busy. */
+#sync-pill.status-pill.syncing{color:#fbbf24;border-color:rgba(251,191,36,.2)}
+#sync-pill.status-pill.syncing>span{background:#fbbf24;box-shadow:0 0 10px rgba(251,191,36,.65);animation:slh-v82-pulse 1s ease-in-out infinite alternate}
+@keyframes slh-v82-pulse{from{opacity:.45;transform:scale(.8)}to{opacity:1;transform:scale(1.12)}}
+
+/* Prevent stale disabled-looking states left by previous runtime builds. */
+#sidebar-nav{isolation:isolate}
+#sidebar-nav>.slh-v710-item span{color:inherit}
+#sidebar-nav>.slh-v710-item i{color:inherit;opacity:.9}
+
+@media(max-width:767px){
+  #sidebar-nav>.slh-v710-item{min-height:44px}
+}
