@@ -1,9 +1,10 @@
 {
   "name":"Smart Link Hub",
-  "version":"7.0.0",
-  "buildId":"slh-v7-20260909",
-  "schema":7,
+  "version":"8.0.0",
+  "buildId":"slh-v8-20260910",
+  "schema":8,
   "channel":"main",
-  "features":["local-first","conflict-safe-cloud","trash","semantic-search","pgvector","full-text-archive","smart-views","duplicate-center","ai-librarian","system-status","dual-theme","pwa","extension-v2"],
-  "generatedAt":"2026-09-09T00:00:00+07:00"
+  "storageMode":"supabase-row-v8",
+  "features":["supabase-row-store","server-confirmed-save","per-link-history","daily-backup","monthly-backup","manual-backup","safe-restore","data-loss-guard-v2","soft-delete","semantic-search","pgvector","full-text-archive","smart-views","duplicate-center","ai-librarian","system-status","dual-theme","pwa","extension-v2"],
+  "generatedAt":"2026-09-10T01:30:00+07:00"
 }
