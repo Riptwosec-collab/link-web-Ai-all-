@@ -60,9 +60,9 @@ jobs:
           const cloud=fs.readFileSync('js/cloud-links.js','utf8');
           for(const s of ['smartlink_link_update_v2','smartlink_link_delete_v2','smartlink_link_restore_v2','smartlink_link_changes_since','smartlink_integrity_status','smartlink_backup_verify','smartlink_import_preview','smartlink_runtime_event_put','smartlink_link_purge','CloudConflictError','Server confirmed'])if(!cloud.includes(s))throw new Error('V8.1 cloud client missing '+s);
           const runtime=fs.readFileSync('js/runtime-fix-v82.js','utf8');
-          for(const s of ['POLL_MS=12000','BroadcastChannel','hydrateCloudLinks','SmartLinkV81=api','updateSidebar','slh_v82_change'])if(!runtime.includes(s))throw new Error('V8.2 runtime repair missing '+s);
+          for(const s of ['POLL_MS=12000','BroadcastChannel','hydrateCloudLinks','SmartLinkV81=api','updateSidebar','slh_v82_change','manualSync','v82-refresh-btn','pageshow'])if(!runtime.includes(s))throw new Error('V8.2.1 runtime repair missing '+s);
           const sync=fs.readFileSync('js/auto-cloud-sync.js','utf8');
-          for(const s of ['RPC_TIMEOUT_MS=7000','applyingRemote','sameLegacyState','smartlink:cloud-force-sync','Cloud ready'])if(!sync.includes(s))throw new Error('Cloud settings sync repair missing '+s);
+          for(const s of ['RPC_TIMEOUT_MS=7000','applyingRemote','sameLegacyState','smartlink:cloud-force-sync','Cloud ready','SmartLinkCloudSyncV82','manualRefresh'])if(!sync.includes(s))throw new Error('Cloud settings sync repair missing '+s);
           const css=fs.readFileSync('css/runtime-fix-v82.css','utf8');
           for(const s of ['appearance:none','#sidebar-nav>.slh-v710-item','background:rgba(255,255,255,.018)'])if(!css.includes(s))throw new Error('Sidebar reset repair missing '+s);
           const data=fs.readFileSync('js/v8-data-center.js','utf8');
@@ -75,9 +75,9 @@ jobs:
           if(m81.includes('112233'))throw new Error('Credential must never be committed in migrations');
 
           const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));if(manifest.name!=='Smart Link Hub V8.1'||!manifest.share_target||manifest.shortcuts?.length<4||!/live multi-device sync/i.test(manifest.description))throw new Error('PWA V8.1 metadata incomplete');
-          const sw=fs.readFileSync('sw.js','utf8');for(const s of ['slh-v82-cloud-ui-repair','utility-v81.css','icons-v81.css','runtime-fix-v82.css','auth-v81-patch.js','runtime-fix-v82.js'])if(!sw.includes(s))throw new Error('Service worker repair cache missing '+s);
+          const sw=fs.readFileSync('sw.js','utf8');for(const s of ['slh-v821-mobile-sync','utility-v81.css','icons-v81.css','runtime-fix-v82.css','auth-v81-patch.js','runtime-fix-v82.js'])if(!sw.includes(s))throw new Error('Service worker mobile sync cache missing '+s);
           const headers=fs.readFileSync('_headers','utf8');for(const s of ['X-Content-Type-Options: nosniff','X-Frame-Options: DENY','Strict-Transport-Security:','Content-Security-Policy-Report-Only:'])if(!headers.includes(s))throw new Error('header missing '+s);
-          console.log('V8.1 + V8.2 runtime repair contracts OK');
+          console.log('V8.1 + V8.2.1 mobile sync contracts OK');
           NODE
 
       - name: Secret hygiene guard
