@@ -26,6 +26,7 @@ async function boot(){
     await load('organization','./organization.js','initOrganization');
     await load('quick-capture','./quick-capture.js','initQuickCapture');
     await load('data-v8','../v8-data-center.js','initDataCenter');
+    await load('ui-v8','../v8-ui-patch.js','initV8UIPatch');
     await load('mobile','./mobile.js','initMobile');
 
     document.documentElement.classList.add('slh-v7-ready');
