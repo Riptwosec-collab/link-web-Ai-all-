@@ -1,8 +1,9 @@
 {
   "name":"Smart Link Hub",
-  "version":"8.0.0",
-  "buildId":"slh-v8-20260910",
-  "schema":8,
+  "version":"7.0.0",
+  "buildId":"slh-v7-20260909",
+  "schema":7,
+  "dataSchema":8,
   "channel":"main",
   "storageMode":"supabase-row-v8",
   "features":["supabase-row-store","server-confirmed-save","per-link-history","daily-backup","monthly-backup","manual-backup","safe-restore","data-loss-guard-v2","soft-delete","semantic-search","pgvector","full-text-archive","smart-views","duplicate-center","ai-librarian","system-status","dual-theme","pwa","extension-v2"],
