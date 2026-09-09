@@ -12,6 +12,7 @@ const tombstoneId=(store,key)=>`${store}:${String(key)}`;
 const now=()=>Date.now();
 const sessionToken=()=>{try{return localStorage.getItem('smartlink_session_token')||''}catch{return ''}};
 const isCloudApplying=()=>Boolean(globalThis.__slhCloudApplying);
+const isLocalE2E=()=>{try{return ['localhost','127.0.0.1','::1'].includes(location.hostname)&&new URLSearchParams(location.search).get('e2e')==='1'}catch{return false}};
 const volatileKey=(name,value)=>name==='settings'?(value?.key):value?.id;
 
 function ensureIndex(objectStore,name,keyPath,options={}){
@@ -37,7 +38,7 @@ function notifyCloud(store,operation,key=null){
   try{window.dispatchEvent(new CustomEvent('smartlink:local-mutation',{detail}))}catch{}
 }
 async function cloudCommitRequired(){
-  if(isCloudApplying())return true;
+  if(isCloudApplying()||isLocalE2E())return true;
   if(!sessionToken())throw new Error('Cloud sign-in required before saving links.');
   if(typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Cloud connection required. Link was not saved.');
   return new Promise((resolve,reject)=>{
@@ -152,8 +153,8 @@ export async function putOne(name,value){
 
 export async function deleteOne(name,key){
   if(name==='links'){
-    if(!isCloudApplying()&&!sessionToken())throw new Error('Cloud sign-in required before deleting links.');
-    if(!isCloudApplying()&&typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Cloud connection required. Link was not deleted.');
+    if(!isCloudApplying()&&!isLocalE2E()&&!sessionToken())throw new Error('Cloud sign-in required before deleting links.');
+    if(!isCloudApplying()&&!isLocalE2E()&&typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Cloud connection required. Link was not deleted.');
     const previous=volatileGetOne('links',key),deletedAt=now();
     if(previous)volatilePut('trash',{id:String(key),entityStore:'links',entityId:String(key),payload:previous,deletedAt,expiresAt:deletedAt+30*864e5});
     volatilePut('tombstones',{id:tombstoneId('links',key),store:'links',key:String(key),deletedAt});
