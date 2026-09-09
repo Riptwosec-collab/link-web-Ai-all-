@@ -131,17 +131,36 @@ async function syncLegacy({showStatus=false}={}){
 }
 
 async function bootstrap(){
-  if(!token()){linkCloudReady=false;setStatus('local');return}
-  if(!navigator.onLine){linkCloudReady=false;setStatus('offline');return}
+  if(!token()){linkCloudReady=false;setStatus('local');return false}
+  if(!navigator.onLine){linkCloudReady=false;setStatus('offline');return false}
   try{
     await hydrateCloudLinks({force:true});
     linkCloudReady=true;
     setStatus('synced','Cloud ready');
     void syncLegacy({showStatus:false});
+    return true;
   }catch(error){
     linkCloudReady=false;
     console.warn('Cloud link hydrate',error);
     setStatus('error','Cloud load failed');
+    return false;
+  }
+}
+
+async function manualRefresh(){
+  if(!token()){setStatus('local');return false}
+  if(!navigator.onLine){setStatus('offline');return false}
+  setStatus('syncing','Refreshing Cloud…');
+  try{
+    await hydrateCloudLinks({force:true});
+    linkCloudReady=true;
+    const settingsOk=await syncLegacy({showStatus:false});
+    setStatus('synced',settingsOk===false?'Cloud links ready':'Cloud refreshed');
+    return true;
+  }catch(error){
+    console.warn('Manual cloud refresh',error);
+    setStatus('error','Cloud refresh failed');
+    return false;
   }
 }
 
@@ -155,9 +174,16 @@ window.addEventListener('smartlink:local-mutation',queueLegacy);
 window.addEventListener('smartlink:session-ready',bootstrap);
 window.addEventListener('smartlink:session-cleared',()=>{linkCloudReady=false;setStatus('local')});
 window.addEventListener('smartlink:cloud-force-sync',()=>void syncLegacy({showStatus:true}));
+window.addEventListener('smartlink:manual-cloud-refresh-settings',()=>void manualRefresh());
 window.addEventListener('online',bootstrap,{passive:true});
 window.addEventListener('offline',()=>setStatus('offline'),{passive:true});
 window.addEventListener('hashchange',()=>setTimeout(()=>setStatus(lastMode,lastDetail),0));
 window.addEventListener('smartlink:cloud-link-saved',e=>setStatus('synced',e?.detail?.operation==='deletion'?'Deleted in Supabase':'Cloud ready'));
+
+window.SmartLinkCloudSyncV82={
+  refresh:manualRefresh,
+  syncSettings:({showStatus=false}={})=>syncLegacy({showStatus}),
+  status:()=>({mode:lastMode,detail:lastDetail,linkCloudReady})
+};
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootstrap,{once:true});else bootstrap();
