@@ -1,4 +1,4 @@
-const CACHE='slh-v82-cloud-ui-repair';
+const CACHE='slh-v821-mobile-sync';
 const CORE=[
   './','./index.html','./share.html','./build-meta.json',
   './css/utility-v81.css','./css/icons-v81.css','./css/app.css','./css/performance-v51.css','./css/card-v12.css','./css/nav-v5.css','./css/premium-v51.css','./css/smooth-v52.css','./css/neo-v54.css','./css/v6-platform.css','./css/theme-v61.css','./css/theme-v61-legacy.css','./css/theme-v61-runtime.css','./css/v7.css','./css/organization-v76.css','./css/quick-capture-v76.css','./css/data-v8.css','./css/runtime-fix-v82.css',
