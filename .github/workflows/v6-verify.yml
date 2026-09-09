@@ -43,14 +43,14 @@ jobs:
             'supabase/migrations/20260910021700_smartlink_v81_observability.sql',
             'supabase/migrations/20260910021800_smartlink_v81_safe_purge.sql'
           ];
-          const files=['build-meta.json','manifest.webmanifest','index.html','share.html','_headers','css/utility-v81.css','css/icons-v81.css','css/runtime-fix-v82.css','css/v7.css','css/data-v8.css','js/v7/boot.js','js/v7/core.js','js/v7/knowledge.js','js/v7/mobile.js','js/v7/quick-capture.js','js/e2e-boot.js','js/auth-v81-patch.js','js/db.js','js/cloud-links.js','js/v8-data-center.js','js/v8-ui-patch.js','js/v8-reliability.js','js/runtime-fix-v82.js','js/auto-cloud-sync.js','js/auto-cloud-ui.js','worker/src/index.js','extension/manifest.json',...migrations];files.forEach(need);
+          const files=['build-meta.json','manifest.webmanifest','index.html','share.html','_headers','css/utility-v81.css','css/icons-v81.css','css/runtime-fix-v82.css','css/mobile-safearea-v822.css','css/v7.css','css/data-v8.css','js/v7/boot.js','js/v7/core.js','js/v7/knowledge.js','js/v7/mobile.js','js/v7/quick-capture.js','js/e2e-boot.js','js/auth-v81-patch.js','js/db.js','js/cloud-links.js','js/v8-data-center.js','js/v8-ui-patch.js','js/v8-reliability.js','js/runtime-fix-v82.js','js/auto-cloud-sync.js','js/auto-cloud-ui.js','worker/src/index.js','extension/manifest.json',...migrations];files.forEach(need);
           for(const f of ['manifest.webmanifest','extension/manifest.json','build-meta.json','package.json'])JSON.parse(fs.readFileSync(f,'utf8'));
 
           const meta=JSON.parse(fs.readFileSync('build-meta.json','utf8'));
           if(meta.version!=='8.1.0'||meta.buildId!=='slh-v81-20260910'||Number(meta.dataSchema)!==8.1||meta.storageMode!=='supabase-row-v8.1')throw new Error('V8.1 build metadata invalid');
 
           const index=fs.readFileSync('index.html','utf8');
-          for(const s of ['slh-v81-20260910','css/utility-v81.css','css/icons-v81.css','css/runtime-fix-v82.css','js/auth-v81-patch.js','js/v7/boot.js','Cloud only'])if(!index.includes(s))throw new Error('index missing '+s);
+          for(const s of ['slh-v81-20260910','css/utility-v81.css','css/icons-v81.css','css/runtime-fix-v82.css','css/mobile-safearea-v822.css','js/auth-v81-patch.js','js/v7/boot.js','Cloud only'])if(!index.includes(s))throw new Error('index missing '+s);
           for(const forbidden of ['cdn.tailwindcss.com','unpkg.com/@phosphor-icons','fonts.googleapis.com','cdn.jsdelivr.net/npm/jszip'])if(index.includes(forbidden))throw new Error('runtime CDN dependency remains: '+forbidden);
 
           const db=fs.readFileSync('js/db.js','utf8');
@@ -65,6 +65,8 @@ jobs:
           for(const s of ['RPC_TIMEOUT_MS=7000','applyingRemote','sameLegacyState','smartlink:cloud-force-sync','Cloud ready','SmartLinkCloudSyncV82','manualRefresh'])if(!sync.includes(s))throw new Error('Cloud settings sync repair missing '+s);
           const css=fs.readFileSync('css/runtime-fix-v82.css','utf8');
           for(const s of ['appearance:none','#sidebar-nav>.slh-v710-item','background:rgba(255,255,255,.018)'])if(!css.includes(s))throw new Error('Sidebar reset repair missing '+s);
+          const mobileCss=fs.readFileSync('css/mobile-safearea-v822.css','utf8');
+          for(const s of ['.v7-mobile-nav','bottom:0!important','background:#05070d!important','safe-area-inset-bottom'])if(!mobileCss.includes(s))throw new Error('Opaque mobile safe-area repair missing '+s);
           const data=fs.readFileSync('js/v8-data-center.js','utf8');
           for(const s of ['Data Integrity Center','Backup checksums','Production Observability','Permanent delete','Verify & restore backup','purgeTrashItem'])if(!data.includes(s))throw new Error('V8.1 Data Center missing '+s);
           const auth=fs.readFileSync('js/auth-v81-patch.js','utf8');if(!auth.includes("const USER='meka'")||auth.includes('112233'))throw new Error('Auth identity patch invalid or credential material committed');
@@ -75,9 +77,9 @@ jobs:
           if(m81.includes('112233'))throw new Error('Credential must never be committed in migrations');
 
           const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));if(manifest.name!=='Smart Link Hub V8.1'||!manifest.share_target||manifest.shortcuts?.length<4||!/live multi-device sync/i.test(manifest.description))throw new Error('PWA V8.1 metadata incomplete');
-          const sw=fs.readFileSync('sw.js','utf8');for(const s of ['slh-v821-mobile-sync','utility-v81.css','icons-v81.css','runtime-fix-v82.css','auth-v81-patch.js','runtime-fix-v82.js'])if(!sw.includes(s))throw new Error('Service worker mobile sync cache missing '+s);
+          const sw=fs.readFileSync('sw.js','utf8');for(const s of ['slh-v822-mobile-safearea','utility-v81.css','icons-v81.css','runtime-fix-v82.css','mobile-safearea-v822.css','auth-v81-patch.js','runtime-fix-v82.js'])if(!sw.includes(s))throw new Error('Service worker mobile safe-area cache missing '+s);
           const headers=fs.readFileSync('_headers','utf8');for(const s of ['X-Content-Type-Options: nosniff','X-Frame-Options: DENY','Strict-Transport-Security:','Content-Security-Policy-Report-Only:'])if(!headers.includes(s))throw new Error('header missing '+s);
-          console.log('V8.1 + V8.2.1 mobile sync contracts OK');
+          console.log('V8.1 + V8.2.2 mobile safe-area contracts OK');
           NODE
 
       - name: Secret hygiene guard
