@@ -4,10 +4,10 @@ async function open(page){
   await page.goto('/?e2e=1',{waitUntil:'domcontentloaded'});
   await page.locator('html.slh-v81-ready').waitFor({state:'attached'});
   await expect(page.locator('#smartlink-auth-gate')).toHaveClass(/hidden/);
-  await page.waitForFunction(()=>typeof window.SmartLinkV81?.poll==='function'&&typeof window.SmartLinkCloudV8?.getIntegrityStatus==='function');
+  await page.waitForFunction(()=>typeof window.SmartLinkV81?.poll==='function'&&typeof window.SmartLinkV81?.manualSync==='function'&&typeof window.SmartLinkCloudV8?.getIntegrityStatus==='function');
   expect(await page.evaluate(()=>window.__SLH_BOOT_ERRORS__||[])).toEqual([]);
 }
-async function reset(page){await page.evaluate(()=>{localStorage.removeItem('slh_e2e_row_store_v81');localStorage.removeItem('slh_v81_change')});await page.reload({waitUntil:'domcontentloaded'});await page.locator('html.slh-v81-ready').waitFor()}
+async function reset(page){await page.evaluate(()=>{localStorage.removeItem('slh_e2e_row_store_v81');localStorage.removeItem('slh_v81_change');localStorage.removeItem('slh_v82_change')});await page.reload({waitUntil:'domcontentloaded'});await page.locator('html.slh-v81-ready').waitFor()}
 
 test('V8.1 keeps link persistence cloud-only across reload and removes legacy link stores',async({page})=>{
   await open(page);await reset(page);
@@ -44,12 +44,26 @@ test('two tabs receive live cloud changes through the V8.1 channel',async({page,
   await second.close();
 });
 
+test('manual refresh button pulls cloud data and exposes a touch-friendly sync action',async({page})=>{
+  await open(page);await reset(page);
+  await expect(page.locator('#v82-refresh-btn')).toBeVisible();
+  await page.evaluate(async()=>{const db=await import('/js/db.js');await db.putOne('links',{id:'v82_manual',url:'https://example.com/manual-sync',normalizedUrl:'https://example.com/manual-sync',title:'Manual Sync'})});
+  await page.locator('#v82-refresh-btn').click();
+  await expect.poll(()=>page.evaluate(()=>document.getElementById('side-links')?.textContent),{timeout:5000}).toBe('1');
+  await expect(page.locator('#v82-refresh-btn')).toHaveAttribute('aria-label',/Cloud sync complete|Refresh and sync cloud/);
+});
+
 test('integrity, import preflight and verified safety backup are available',async({page})=>{
   await open(page);await reset(page);
   const result=await page.evaluate(async()=>{const db=await import('/js/db.js');await db.bulkPut('links',[{id:'imp1',url:'https://example.com/imp1',normalizedUrl:'https://example.com/imp1',title:'Import 1'},{id:'imp2',url:'https://example.com/imp2',normalizedUrl:'https://example.com/imp2',title:'Import 2'}]);const integrity=await db.getIntegrityStatus(),backups=await db.listBackups(20),verified=backups[0]?await db.verifyBackup(backups[0].id):null,preview=await db.previewImport([{url:'https://example.com/imp1',normalizedUrl:'https://example.com/imp1'},{url:'https://example.com/new',normalizedUrl:'https://example.com/new'}]);return {integrity,backupCount:backups.length,verified,preview}});
   expect(Number(result.integrity.live_links)).toBe(2);expect(Number(result.integrity.duplicate_groups)).toBe(0);expect(result.backupCount).toBeGreaterThan(0);expect(result.verified.ok).toBeTruthy();expect(Number(result.preview.duplicate_cloud)).toBe(1);
 });
 
-test('@mobile V8.1 reliability status and cloud-only search remain usable',async({page})=>{
-  await open(page);await expect(page.locator('#v81-live-pill')).toBeVisible();await expect(page.locator('#v7-mobile-nav')).toBeVisible();
+test('@mobile V8.2 refresh/sync button remains visible and usable on phone layout',async({page})=>{
+  await open(page);
+  await expect(page.locator('#v82-refresh-btn')).toBeVisible();
+  const box=await page.locator('#v82-refresh-btn').boundingBox();expect(box.width).toBeGreaterThanOrEqual(40);expect(box.height).toBeGreaterThanOrEqual(40);
+  await expect(page.locator('#v7-mobile-nav')).toBeVisible();
+  await page.locator('#v82-refresh-btn').click();
+  await expect(page.locator('#v82-refresh-btn')).not.toHaveClass(/error/);
 });
