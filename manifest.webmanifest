@@ -1,8 +1,8 @@
 {
   "id":"/",
-  "name":"Smart Link Hub V8",
+  "name":"Smart Link Hub V7",
   "short_name":"Link Hub",
-  "description":"Personal Web Memory with Supabase-only link storage, server-confirmed saves, semantic AI search, full-text archive, version history and safe cloud backups.",
+  "description":"Personal Web Memory with V8 Supabase-only link storage, server-confirmed saves, semantic AI search, full-text archive, version history and safe cloud backups.",
   "start_url":"/",
   "scope":"/",
   "display":"standalone",
