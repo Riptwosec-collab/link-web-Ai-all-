@@ -12,7 +12,7 @@ async function boot(){let core=null;try{
  await load('ui-v8','../v8-ui-patch.js','initV8UIPatch');
  await load('runtime-v82','../runtime-fix-v82.js','initRuntimeFixV82');
  await load('mobile','./mobile.js','initMobile');
- document.documentElement.classList.add('slh-v7-ready','slh-data-v8-ready','slh-v82-ready');
+ document.documentElement.classList.add('slh-v7-ready','slh-data-v8-ready','slh-v81-ready','slh-v82-ready');
  if(!BOOT_ERRORS.some(x=>['organization','quick-capture'].includes(x.stage)))document.documentElement.classList.add('slh-v76-ready');
  document.documentElement.dataset.slhBootErrors=String(BOOT_ERRORS.length);document.documentElement.dataset.slhStorage='supabase-row-v8.1';
  window.dispatchEvent(new CustomEvent('smartlink:v7-ready',{detail:{build:core?.BUILD||window.__SLH_BUILD__||null,storage:'supabase-row-v8.1',runtime:'8.2-fix',errors:[...BOOT_ERRORS]}}));
