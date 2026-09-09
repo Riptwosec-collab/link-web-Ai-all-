@@ -1,11 +1,11 @@
 {
   "name":"Smart Link Hub",
-  "version":"7.0.0",
-  "buildId":"slh-v7-20260909",
+  "version":"8.1.0",
+  "buildId":"slh-v81-20260910",
   "schema":7,
-  "dataSchema":8,
+  "dataSchema":8.1,
   "channel":"main",
-  "storageMode":"supabase-row-v8",
-  "features":["supabase-row-store","server-confirmed-save","per-link-history","daily-backup","monthly-backup","manual-backup","safe-restore","data-loss-guard-v2","soft-delete","semantic-search","pgvector","full-text-archive","smart-views","duplicate-center","ai-librarian","system-status","dual-theme","pwa","extension-v2"],
-  "generatedAt":"2026-09-10T01:30:00+07:00"
+  "storageMode":"supabase-row-v8.1",
+  "features":["supabase-row-store","server-confirmed-save","optimistic-concurrency","live-multi-device-sync","broadcast-tab-sync","per-link-history","daily-backup","monthly-backup","manual-backup","backup-checksum","backup-verification","pre-restore-backup","pre-import-backup","import-preflight","safe-restore","data-loss-guard-v2","soft-delete","individual-safe-purge","data-integrity-center","runtime-observability","offline-save-block","semantic-search","hybrid-search","pgvector","full-text-archive","category-confidence-review","smart-views","duplicate-center","ai-librarian","system-status","local-utility-css","local-icon-layer","pwa","extension-v2"],
+  "generatedAt":"2026-09-10T02:45:00+07:00"
 }
