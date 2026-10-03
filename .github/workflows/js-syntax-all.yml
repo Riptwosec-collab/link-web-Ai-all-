@@ -1,16 +1,22 @@
 name: Smart Link Hub JavaScript Syntax Gate
 
+# Full syntax coverage is now part of the primary V8.1 verification workflow.
+# Keep this standalone gate for manual diagnostics without paying for a second
+# runner on every main push.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   syntax:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
