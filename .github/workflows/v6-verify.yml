@@ -3,16 +3,31 @@ name: Smart Link Hub V8.1 Verification
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'screenshots/**'
+      - '.github/ISSUE_TEMPLATE/**'
   pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'screenshots/**'
+      - '.github/ISSUE_TEMPLATE/**'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,14 +36,13 @@ jobs:
 
       - name: JavaScript syntax
         run: |
-          set -e
-          for f in \
-            js/db.js js/cloud-links.js js/v8-data-center.js js/v8-ui-patch.js js/v8-reliability.js js/runtime-fix-v82.js js/auto-cloud-sync.js js/auto-cloud-ui.js js/nav-hotfix-v79.js js/auth-gate.js js/auth-v81-patch.js \
-            js/v6-platform.js js/v6-bridge.js js/v6-import.js js/v6-bulk-extra.js js/theme-v61.js \
-            js/e2e-boot.js js/v7/core.js js/v7/search-worker.js js/v7/knowledge.js js/v7/mobile.js js/v7/boot.js js/v7/quick-capture.js \
-            sw.js worker/src/index.js extension/popup.js extension/background.js playwright.config.js tests/v7.spec.js tests/v81-reliability.spec.js; do
+          set -euo pipefail
+          while IFS= read -r -d '' f; do
+            echo "Checking $f"
             node --check "$f"
-          done
+          done < <(find js worker/src extension tests -type f -name '*.js' -print0)
+          node --check sw.js
+          node --check playwright.config.js
 
       - name: Verify V8.1 contracts
         run: |
@@ -92,15 +106,17 @@ jobs:
           NODE
 
       - name: Install Playwright
+        if: github.event_name != 'push'
         run: |
           npm install --no-audit --no-fund
           npx playwright install chromium
 
       - name: Browser E2E
+        if: github.event_name != 'push'
         run: npm run test:e2e
 
       - name: Upload Playwright report on failure
-        if: failure()
+        if: failure() && github.event_name != 'push'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
@@ -108,4 +124,4 @@ jobs:
             playwright-report
             test-results
           if-no-files-found: ignore
-          retention-days: 7
+          retention-days: 1
