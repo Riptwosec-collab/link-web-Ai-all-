@@ -98,8 +98,11 @@ jobs:
           npm install --no-audit --no-fund
           npx playwright install chromium
 
+      - name: Browser boot preflight
+        run: npx playwright test tests/boot-preflight.spec.js --project=chromium
+
       - name: Browser E2E
-        run: npm run test:e2e
+        run: npm run test:e2e -- --max-failures=1
 
       - name: Upload Playwright report on failure
         if: failure()
