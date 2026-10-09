@@ -1,8 +1,6 @@
 name: Smart Link Hub JavaScript Syntax Gate
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
